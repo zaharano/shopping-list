@@ -3,6 +3,9 @@ from recipe_scrapers import scrape_me
 from termcolor import colored, cprint
 from simple_term_menu import TerminalMenu
 from utils import convert_to_pint_unit
+from ingredient_categorizer import categorize_ingredient
+
+DEBUG_MODE = True
 
 class ShoppingList:
   def __init__(self, items = []):
@@ -157,13 +160,11 @@ class Ingredient:
   def __init__(self, text):
     self._sentence = text
     self._parsed = parse_ingredient(text)
+    self._category = categorize_ingredient(self.name)
+    print(self._category)
     # convert unit to pint library unit for easy conversion and comparison
     if self._parsed.amount[0].unit:
       self._parsed.amount[0].unit = convert_to_pint_unit(self._parsed.amount[0].unit)
-      quant = self._parsed.amount[0].unit * int(self._parsed.amount[0].quantity)
-      print(quant.magnitude)
-      print(quant.units)
-    # TODO: init category
 
   def __str__(self):
     text = self.name
@@ -209,15 +210,22 @@ class Ingredient:
     return self._parsed
 
 def main():
-  shopping_list = ShoppingList()
   OPTIONS = [
     "Add ingredients from recipe to shopping list (by URL, works with most recipe pages)", 
     "Add a single item to the shopping list", 
     "Remove items from the shopping list",
     "View current shopping list", 
     "Export list and quit",
+  ]
+  DEBUG_OPTIONS = [
     "Print an item's parsed data (for debugging)"
   ]
+
+  if DEBUG_MODE:
+    OPTIONS += DEBUG_OPTIONS
+  
+  shopping_list = ShoppingList()
+  
   termal_menu = TerminalMenu(OPTIONS)
   while(True):
     menu_entry_index = termal_menu.show()
@@ -248,10 +256,10 @@ def main():
       print(shopping_list._items[select])
 
 if __name__ == "__main__":
-  # main()
-  cups = convert_to_pint_unit('cups')
-  quarts = convert_to_pint_unit('quarts')
-  print(cups)
-  print(quarts)
-  print(cups.is_compatible_with(quarts))
-  print((2 * cups) + (3 * quarts)) # should fail
+  main()
+  # cups = convert_to_pint_unit('cups')
+  # quarts = convert_to_pint_unit('quarts')
+  # # print(cups)
+  # # print(quarts)
+  # # print(cups.is_compatible_with(quarts))
+  # # print((2 * cups) + (3 * quarts))
