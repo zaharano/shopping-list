@@ -1,3 +1,9 @@
+import inflect
+
+p = inflect.engine()
+
+# for now just doing a lookup of these static lists to categorize ingredients
+# obviously db later, that can be added to on the fly
 
 ### Produce categories
 ## Fruits
@@ -6,7 +12,8 @@ apples = ['apple', 'fuji apple', 'gala apple', 'golden delicious apple', 'granny
 oranges = ['orange', 'blood orange', 'clementine', 'mandarin orange', 'navel orange', 'tangerine']
 lemons = ['lemon', 'meyer lemon']
 limes = ['lime', 'key lime']
-citrus = [*oranges, *lemons, *limes]
+citrus_juices = ['fresh orange juice', 'fresh lemon juice', 'fresh lime juice', 'orange juice', 'lemon juice', 'lime juice', 'juice of orange', 'juice of lemon', 'juice of lime', 'orange zest', 'lemon zest', 'lime zest']
+citrus = [*oranges, *lemons, *limes, *citrus_juices]
 
 grapes = ['grape', 'concord grape', 'cotton candy grape', 'green grape', 'red grape', 'black grape', 'purple grape', 'seedless grape', 'grapefruit', 'red grapefruit', 'white grapefruit']
 berries = ['berry', 'blackberry', 'blueberry', 'cranberry', 'raspberry', 'strawberry']
@@ -19,14 +26,15 @@ fruit = [*apples, *citrus, *grapes, *berries, *bananas, *kiwi, *tropical, *melon
 
 ## Vegetables
 squashes = ['acorn squash', 'butternut squash', 'delicata squash', 'hubbard squash', 'spaghetti squash', 'yellow squash', 'zucchini']
-root_vegetables = ['beet', 'carrot', 'parsnip', 'potato', 'radish', 'rutabaga', 'sweet potato', 'turnip']
-leafy_greens = ['arugula', 'collard greens', 'kale', 'lettuce', 'spinach', 'swiss chard']
-cruciferous_vegetables = ['broccoli', 'brussels sprout', 'cabbage', 'cauliflower', 'kohlrabi']
-alliums = ['chive', 'garlic', 'leek', 'onion', 'shallot']
+root_vegetables = ['beet', 'carrot', 'parsnip', 'potato', 'radish', 'rutabaga', 'sweet potato', 'turnip', 'red potato', 'gold potato', 'yukon potato', 'fingerling potato', 'purple potato', 'white potato', 'russet potato', 'new potato', 'baby potato', 'baby red potato', 'baby gold potato', 'baby yukon potato', 'baby fingerling potato', 'baby purple potato', 'baby white potato',]
+leafy_greens = ['arugula', 'collard greens', 'kale', 'lettuce', 'spinach', 'swiss chard', 'endive', 'escarole', 'frisee', 'mesclun', 'mizuna', 'mustard greens', 'radicchio', 'sorrel', 'watercress', 'bok choy', 'chinese cabbage', 'napa cabbage', 'savoy cabbage', 'cabbage', ]
+cruciferous_vegetables = ['broccoli', 'brussels sprout', 'brussel', 'brussel sprout', 'cabbage', 'cauliflower', 'kohlrabi']
+alliums = ['chive', 'garlic', 'leek', 'onion', 'shallot', 'green onion', 'scallion', 'spring onion', 'ramp', 'red onion', 'white onion', 'yellow onion', 'sweet onion', 'pearl onion', 'cippolini onion', 'vidalia onion', 'walla walla onion', 'maui onion', 'elephant garlic', 'garlic scape', 'garlic chive']
+other_vegetables = ['celery', 'cucumber', 'eggplant', 'fennel', 'okra', 'pea', 'snap pea', 'snow pea', 'tomato', 'cherry tomato', 'grape tomato', 'heirloom tomato', 'roma tomato', 'beefsteak tomato', 'plum tomato', 'green tomato', 'yellow tomato', 'orange tomato', 'purple tomato', 'white tomato', 'black tomato', 'pink tomato', 'striped tomato', 'corn', 'artichoke', 'asparagus', 'snap bean', 'green bean', 'wax bean', ]
 herbs = ['basil', 'cilantro', 'dill', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'thyme']
-peppers = ['bell pepper', 'jalapeno', 'jalapeño', 'poblano', 'serrano']
+peppers = ['bell pepper', 'green bell pepper', 'red bell pepper', 'yellow bell pepper', 'orange bell pepper', 'green pepper', 'red pepper', 'orange pepper', 'jalapeno', 'jalapeño', 'jalapeno peppers', 'poblano', 'poblano peppers', 'serrano', 'serrano peppers']
 mushrooms = ['button mushroom', 'cremini mushroom', 'portobello mushroom', 'shiitake mushroom']
-vegetables = [*squashes, *root_vegetables, *leafy_greens, *cruciferous_vegetables, *alliums, *herbs, *peppers, *mushrooms]
+vegetables = [*squashes, *root_vegetables, *leafy_greens, *cruciferous_vegetables, *alliums, *herbs, *peppers, *mushrooms, *other_vegetables]
 
 ### Meat categories
 ## Poultry
@@ -99,12 +107,33 @@ beans = ['black bean', 'black beans', 'black-eyed pea', 'cannellini', 'cannelini
 oils = ['oil', 'olive oil', 'vegetable oil', 'canola oil', 'coconut oil', 'sesame oil', 'peanut oil', 'sunflower oil', 'safflower oil', 'corn oil', 'soybean oil', 'grapeseed oil', 'avocado oil', 'walnut oil', 'almond oil', 'hazelnut oil', 'palm oil', 'lard', 'shortening', 'margarine', 'butter', 'ghee', 'clarified butter',]
 vinegars = ['vinegar', 'balsamic vinegar', 'apple cider vinegar', 'red wine vinegar', 'white wine vinegar', 'rice vinegar', 'sherry vinegar', 'malt vinegar', 'distilled vinegar', 'cane vinegar', 'coconut vinegar', 'date vinegar', 'honey vinegar', 'malt vinegar', 'mango vinegar', 'palm vinegar', 'sugarcane vinegar', 'beer vinegar', 'cider vinegar', 'fruit vinegar', 'herb vinegar', 'spice vinegar', 'wine vinegar',]
 
+### sauces etc
+sauces = ['sauce', 'alfredo sauce', 'bbq sauce', 'bechamel sauce', 'chimichurri sauce', 'cocktail sauce', 'cranberry sauce', 'enchilada sauce', 'gravy', 'hollandaise sauce', 'hot sauce', 'marinara sauce', 'pesto', 'salsa', 'soy sauce', 'sweet and sour sauce', 'tahini', 'teriyaki sauce', 'tzatziki', 'worcestershire sauce', 'hoisin sauce', 'oyster sauce', 'fish sauce', 'ponzu', 'tartar sauce', 'remoulade', 'ranch dressing', 'blue cheese dressing', 'thousand island dressing', 'italian dressing', 'vinaigrette', 'ranch', 'blue cheese', 'thousand island', 'italian', 'vinaigrette', 'dressing', 'dip', 'aioli', 'mayo', 'mayonnaise', 'ketchup', 'mustard', 'mustard sauce',]
+
+### nuts
+nuts = ['nut', 'almond', 'brazil nut', 'cashew', 'chestnut', 'hazelnut', 'macadamia nut', 'pecan', 'pine nut', 'pistachio', 'walnut', 'peanut',]
+nut_butters = ['nut butter', 'almond butter', 'cashew butter', 'hazelnut butter', 'macadamia nut butter', 'pecan butter', 'peanut butter', 'walnut butter', 'pistachio butter', 'sunflower seed butter', 'tahini', 'almond paste', 'marzipan',]
+
+### seeds
+seeds = ['sunflower seed', 'pumpkin seed', 'sesame seed', 'chia seed', 'pepita', 'flaxseed', 'hemp seed', 'poppy seed',  'chia', 'flax', 'seed',]
+
+### dried fruits
+dried_berries = ['dried berry', 'dried blackberry', 'dried blueberry', 'dried cranberry', 'dried raspberry', 'dried strawberry', 'raisin', 'gold raisin', 'golden raisin', 'dried cherry', 'dried currant', 'dried grape']
+dried_fruits = ['dried apricot', 'prune', 'dried plum', 'date', 'mejool date', 'mehjool date', 'medjool date', 'fig', 'dried fig', 'dried peach', 'dried pear', 'dried apple', 'dried banana', 'dried coconut', 'dried mango', 'dried papaya', 'dried pineapple', 'dried kiwi', 'dried stone fruit', 'dried tropical fruit', 'dried fruit',]
+
+### baking
+flours = ['flour', 'all-purpose flour', 'bread flour', 'cake flour', 'pastry flour', 'self-rising flour', 'whole wheat flour', 'almond flour', 'coconut flour', 'cornmeal', 'cornstarch', 'oat flour', 'rice flour', 'rye flour', 'semolina', 'spelt flour', 'tapioca flour', 'teff flour', 'wheat flour', 'gluten-free flour', 'gluten free flour', 'gluten free all-purpose flour', 'gluten free bread flour', 'gluten free cake flour', 'gluten free pastry flour', 'gluten free self-rising flour', 'gluten free whole wheat flour', 'gluten free almond flour', 'gluten free coconut flour', 'gluten free cornmeal', 'gluten free cornstarch', 'gluten free oat flour', 'gluten free rice flour', 'gluten free rye flour', 'gluten free semolina', 'gluten free spelt flour', 'gluten free tapioca flour', 'gluten free teff flour', 'gluten free wheat flour',]
+sugars = ['sugar', 'brown sugar', 'confectioners sugar', 'powdered sugar', 'granulated sugar', 'caster sugar', 'superfine sugar', 'turbinado sugar', 'demerara sugar', 'muscovado sugar', 'palm sugar', 'coconut sugar', 'date sugar', 'maple sugar', 'molasses', 'honey', 'agave', 'corn syrup', 'golden syrup', 'maple syrup', 'pancake syrup', 'simple syrup', 'syrup', 'treacle', 'treacle syrup', 'treacle sugar', 'treacle molasses', 'treacle honey', 'treacle agave', 'treacle corn syrup', 'treacle golden syrup', 'treacle maple syrup', 'treacle pancake syrup', 'treacle simple syrup', 'treacle syrup', 'treacle treacle', 'treacle',]
+leaveners = ['baking powder', 'baking soda', 'cream of tartar', 'yeast', 'instant yeast', 'active dry yeast', 'sourdough starter', 'starter', 'levain', ]
+chocolates = ['chocolate', 'bittersweet chocolate', 'semisweet chocolate', 'dark chocolate', 'milk chocolate', 'white chocolate', 'cocoa powder', 'cacao powder', 'cacao nib', 'cacao butter', 'cacao', 'cocoa', 'chocolate chip', 'chocolate chunk', 'chocolate bar', 'chocolate syrup', 'chocolate sauce', 'chocolate spread', 'chocolate frosting', 'chocolate glaze', 'chocolate ganache', 'chocolate mousse', 'chocolate pudding',]
+baking = [*flours, *sugars, *leaveners, *chocolates]
+
 ### Spices and dried herbs
-spices = ['spice', 'allspice', 'anise', 'annatto', 'asafoetida', 'caraway', 'cardamom', 'cayenne', 'celery seed', 'chervil', 'ground chili', 'chili powder', 'cinnamon', 'ground cinnamon', 'cloves', 'ground cloves', 'coriander', 'cumin', 'cumin seed', 'ground cumin', 'curry', 'curry powder', 'fennel seed', 'fenugreek seed', 'garlic powder', 'ginger powder', 'ground ginger', 'lavender', 'mustard seed', 'mustard powder', 'nutmeg', 'ground nutmeg', 'paprika', 'black pepper', 'poppy seed', 'rosemary', 'saffron', 'sage', 'savory', 'tarragon', 'thyme', 'turmeric', 'vanilla', 'wasabi', 'zaatar',]
+spices = ['spice', 'allspice', 'anise', 'annatto', 'asafoetida', 'caraway', 'cardamom', 'cayenne', 'celery seed', 'chervil', 'ground chili', 'chili powder', 'cinnamon', 'ground cinnamon', 'clove', 'ground clove', 'coriander', 'cumin', 'cumin seed', 'ground cumin', 'curry', 'curry powder', 'fennel seed', 'fenugreek seed', 'garlic powder', 'ginger powder', 'ground ginger', 'lavender', 'mustard seed', 'mustard powder', 'nutmeg', 'ground nutmeg', 'paprika', 'black pepper', 'poppy seed', 'rosemary', 'saffron', 'sage', 'savory', 'tarragon', 'thyme', 'turmeric', 'vanilla', 'wasabi', 'zaatar',]
 dried_herbs = ['herb', 'basil', 'bay leaf', 'chervil', 'chive', 'cilantro', 'dill', 'lavender', 'lemon grass', 'marjoram', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'savory', 'tarragon', 'thyme']
 all_spices = [*spices, *dried_herbs]
 
-you_probably_have = ['salt', 'kosher salt', 'pepper', 'black pepper', 'salt and pepper', 'salt & pepper']
+you_probably_have = ['water', 'salt', 'kosher salt', 'pepper', 'black pepper', 'salt and pepper', 'salt & pepper']
 
 # dairy, sauces, canned, baking, snacks, beverages, frozen, misc
 
@@ -114,13 +143,15 @@ grocer_categories = {
     'seafood': [*fresh_seafood],
     'bread': [*bread],
     'dairy': [*dairy_milks, *alternative_milks, *butter, *yogurt, *sour_creams, *all_cheeses],
-    'pantry': [*pastas, *rices, *grains, *canned_fish, *anchovy, *beans, *vinegars, *oils, *all_spices, ],
+    'pantry': [*pastas, *rices, *grains, *canned_fish, *anchovy, *beans, *vinegars, *oils, *all_spices, *sauces, *nuts, *nut_butters, *seeds, *dried_fruits, *dried_berries],
+    'baking': [*baking],
 }
 
 #TODO: cases where unit influences category
 #TODO: preferred returns etc etc.
 def categorize_ingredient(ingredient, unit = None):
-    for category, items in grocer_categories.items():
-      if ingredient in items:
-        return category
-    return 'misc'
+  for category, items in grocer_categories.items():
+    pluralized = [p.plural(i) for i in items]
+    if ingredient.lower() in items or ingredient in pluralized:
+      return category
+  return 'misc'
