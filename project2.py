@@ -7,6 +7,12 @@ from ingredient_categorizer import categorize_ingredient
 
 DEBUG_MODE = True
 
+#TODO: Move all feedback to main - the ShoppingList class should only handle data
+#TODO: probably means moving remove_items_menu() to main
+#TODO: Set up the handling of coeff
+#TODO: Fix the existing_item method
+
+
 class ShoppingList:
   def __init__(self, items = []):
     self._items = items
@@ -17,6 +23,10 @@ class ShoppingList:
     for item in self._items:
       lines.append(str(item))
     return '\n'.join(lines)
+
+  @property
+  def items(self):
+    return self._items
 
   def length(self):
     return len(self._items)
@@ -66,15 +76,7 @@ class ShoppingList:
       #     return True
       #   return
     return False
-
-  def add_single_item(self, item):
-    if not item:
-      cprint("You didn't enter an item!", 'red')
-      return
-    self.add_item(item)
-    cprint(f"Added item. The shopping list now has {self.length()} items.", 'green')
-
-  
+    
   def remove_item(self, index):
     try:
       del self._items[int(index)]
@@ -161,10 +163,11 @@ class Ingredient:
     self._sentence = text
     self._parsed = parse_ingredient(text)
     self._category = categorize_ingredient(self.name)
-    print(self._category)
-    # convert unit to pint library unit for easy conversion and comparison
-    if self._parsed.amount[0].unit:
+    # convert unit to pint unit for easy conversion and comparison
+    try:
       self._parsed.amount[0].unit = convert_to_pint_unit(self._parsed.amount[0].unit)
+    except:
+      pass
 
   def __str__(self):
     text = self.name
@@ -212,7 +215,7 @@ class Ingredient:
 def main():
   OPTIONS = [
     "Add ingredients from recipe to shopping list (by URL, works with most recipe pages)", 
-    "Add a single item to the shopping list", 
+    "Add items to shopping list", 
     "Remove items from the shopping list",
     "View current shopping list", 
     "Export list and quit",
@@ -223,25 +226,37 @@ def main():
 
   if DEBUG_MODE:
     OPTIONS += DEBUG_OPTIONS
-  
-  shopping_list = ShoppingList()
-  
+    
   termal_menu = TerminalMenu(OPTIONS)
+
+  shopping_list = ShoppingList()
+
   while(True):
     menu_entry_index = termal_menu.show()
     if menu_entry_index == 0:
       url = input("Enter the URL of the recipe: ")
       shopping_list.add_recipe(url)
+
     elif menu_entry_index == 1:
-      item = input("Enter the item to add: ")
-      shopping_list.add_single_item(item)
+      while(True):
+        item = input("Enter an item to add (enter nothing to stop adding items): ")
+        if item == '':
+          break
+        try:
+          shopping_list.add_item(item)
+          cprint(f"Added item. The shopping list now has {shopping_list.length()} items.", 'green')
+        except TypeError as e:
+          cprint(e, 'red')
+
     elif menu_entry_index == 2:
       shopping_list.remove_items_menu()
+
     elif menu_entry_index == 3:
       if shopping_list.length() == 0:
         print("The shopping list is empty!")
       else:
         print(f'\n{shopping_list}\n')
+        
     elif menu_entry_index == 4:
       if shopping_list.length() == 0:
         print("Nothing to export! See ya!")
