@@ -49,37 +49,37 @@ class ShoppingList:
     self._items.append(new_item)
  
   # if ingredient with same name exists, add the quantity (or use the new amount there is none)
-  # TODO: account for singular/plural of units and ingredients
-  # longterm TODO: convert units if they don't match
+  # longterm TODO: account for singular/plural of units and ingredients
+  # longterm TODO: smarter units - conversion, preferred unit for shopping, etc
   # longterm TODO: account for different ways of writing the same ingredient
   def existing_item(self, new_item):
     for i in self._items:
-      pass
-      # if i.name == new_item.name:
-      #   try:
-      #     if i.amount.unit.is_compatible_with(new_item.amount.unit):
-      #       existing = i.amount.unit * int(i.amount.quantity)
-      #       new = new_item.amount.unit * int(new_item.amount.quantity)
-      #       i.amount.quantity = (existing + new).to
-      #       return True
-      #   except:
-      #     pass #WHAT IS THIS
-      #   if i.amount and new_item.amount:
-      #     if not i.amount.unit.is_compatible_with(new_item.amount.unit):
-      #       cprint(f"Units don't match for {i.name} - {i.amount.unit} and {new_item.amount.unit}. This program doesn't support conversion yet. Keeping existing amount - you can manually add this item again using the same unit to add more to your list!", 'red')
-      #       return
-      #     else:
-      #       existing = i.amount.unit * i.amount.quantity
-      #       new = new_item.amount.unit * new_item.amount.quantity
-      #       i.amount.quantity = (existing + new).to
-      #       i.amount.quantity += new_item.amount.quantity
-      #       return True
-      #   elif i.amount:
-      #     return
-      #   elif new_item.amount:
-      #     i.amount = new_item.amount
-      #     return True
-      #   return
+      if i.name == new_item.name:
+        # if they have pint units, try to add them
+        # TODO: fix that this is only one confirmed pint unit
+        try:
+          if i.unit.is_compatible_with(new_item.unit):
+            existing = i.unit * float(i.quantity)
+            new = new_item.unit * float(new_item.quantity)
+            i.quantity = str((existing + new).magnitude)
+            return True
+        except:
+          pass 
+
+        # if they are not pint units, compare the unit strings
+        if i.unit and new_item.unit:
+          if i.unit == new_item.unit:
+            i.quantity = str(float(i.quantity) + float(new_item.quantity))
+            return True
+
+        # if there are no units, just add the quantity
+        if not i.unit and not new_item.unit:
+          i.quantity = str(float(i.quantity) + float(new_item.quantity))
+          return True
+
+        cprint(f"Same ingredient but incompatible units {i.name} - {i.unit} and {new_item.unit}. This program doesn't support this conversion. Keeping existing amount - you can manually add this item again using the existing unit to add more to your list!", 'red')
+        return True
+
     return False
     
   def remove_item(self, index):
@@ -95,15 +95,19 @@ class ShoppingList:
       self.add_item(ingredient, recipe.coeff)
 
 class Recipe:
-  def __init__(self, title, ingredients, url, data = None, coeff = 1):
+  def __init__(self, title, ingredients, yields, url, data = None, coeff = 1):
     self._title = title
     self._ingredients = ingredients
+    if coeff != 1:
+      self._yields = yields + f' ({coeff}x ingredients)'
+    else:
+      self._yields = yields
     self._url = url
     self._data = data
     self._coeff = coeff
 
   def __str__(self):
-    lines = [self.title, self.url]
+    lines = [self.title + ' | ' + self.yeilds, self.url]
     return '\n'.join(lines)
 
   @property
@@ -113,6 +117,10 @@ class Recipe:
   @property
   def ingredients(self):
     return self._ingredients
+
+  @property
+  def yeilds(self):
+    return self._yields
 
   @property
   def url(self):
@@ -188,7 +196,7 @@ class Ingredient:
   @quantity.setter
   def quantity(self, value):
     if self._parsed.amount and self._parsed.amount[0] and self._parsed.amount[0].quantity:
-      self._parsed.amount[0].quantity = value
+      self._parsed.amount[0].quantity = f'{float(value):.2g}'
       new_text = []
       new_text.append(value)
       if self.amount.unit:
@@ -247,6 +255,7 @@ def main():
   shopping_list = ShoppingList()
 
   while(True):
+    terminal_menu = TerminalMenu(OPTIONS, status_bar="Items: " + str(shopping_list.length()) + " | Recipes: " + str(len(shopping_list.recipes)))
     menu_entry_index = terminal_menu.show()
 
     # Add ingredients from recipe to shopping list
@@ -285,7 +294,7 @@ def main():
               break
             except:
               cprint("Not a valid coefficient. Enter a number more than zero and less than 100.", 'red')
-      new_recipe = Recipe(scraper.title(), scraper.ingredients(), url, scraper, coeff)
+      new_recipe = Recipe(scraper.title(), scraper.ingredients(), scraper.yields(), url, scraper, coeff)
       shopping_list.add_recipe(new_recipe)
       cprint(f"Added items from recipe. The shopping list now has {shopping_list.length()} items.", 'green')
 
@@ -335,7 +344,7 @@ def main():
         file.write(str(shopping_list))
         file.write('\n\nRecipes:\n')
         for recipe in shopping_list.recipes:
-          file.write(str(recipe))
+          file.write(str(recipe) + '\n')
         cprint(f"Exported {shopping_list.length()} item long list to {filename}.", 'green')
       return 0
 
@@ -349,3 +358,12 @@ def main():
 
 if __name__ == "__main__":
   main()
+  # one = Ingredient('1 cup of flour')
+  # two = Ingredient('2 cup of flour')
+
+  # thing = float(one.amount.quantity) * one.amount.unit
+  # bass = float(two.amount.quantity) * two.amount.unit
+
+  # added = thing + bass
+
+  # print(added.magnitude)
