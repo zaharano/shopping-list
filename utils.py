@@ -1,6 +1,9 @@
-# this is taken from a newer version of the parser - eventually this will just be from that but wanted to get the pint func going
 import pint
+import inflect
 
+p = inflect.engine()
+
+# this is taken from a newer version of the parser - eventually this will just be from that but wanted to get the pint func going
 # Plural and singular units
 UNITS = {
     "bags": "bag",
@@ -182,3 +185,110 @@ def convert_to_pint_unit(unit: str, imperial_units: bool = False) -> str | pint.
         return pint.Unit(unit)
 
     return unit
+
+
+def singularize_unit(unit: str) -> str:
+    """Return the singular form of a unit, if it exists in the UNITS dictionary.
+    If the unit is not found in the dictionary, just return the input unit.
+
+    Parameters
+    ----------
+    unit : str
+        Unit to singularize
+
+    Returns
+    -------
+    str
+
+    Examples
+    --------
+    >>> singularize("cups")
+    'cup'
+
+    >>> singularize("pints")
+    'pint'
+
+    >>> singularize("g")
+    'g'
+    """
+    return UNITS.get(unit, unit)
+
+def pluralize_unit(unit: str) -> str:
+    """Return the plural form of a unit, if it exists in the UNITS dictionary.
+    If the unit is not found in the dictionary, just return the input unit.
+
+    Parameters
+    ----------
+    unit : str
+        Unit to pluralize
+
+    Returns
+    -------
+    str
+
+    Examples
+    --------
+    >>> pluralize("cup")
+    'cups'
+
+    >>> pluralize("pint")
+    'pints'
+
+    >>> pluralize("g")
+    'g'
+    """
+    return UNITS.get(unit, unit)
+
+def pluralize(noun: str, count: int = 1) -> str:
+    """Return the plural form of a noun, from inflect engine.
+
+    Parameters
+    ----------
+    noun : str
+        Noun to pluralize
+
+    Returns
+    -------
+    str
+
+    Examples
+    --------
+    >>> pluralize_noun("cup")
+    'cups'
+
+    >>> pluralize_noun("pint")
+    'pints'
+
+    >>> pluralize_noun("g")
+    'g'
+    """
+    if count == 1:
+        return noun
+    return p.plural(noun, count)
+
+def singularize(noun: str) -> str:
+    """Return the singular form of a noun, from inflect engine.
+
+    Parameters
+    ----------
+    noun : str
+        Noun to singularize
+
+    Returns
+    -------
+    str
+
+    Examples
+    --------
+    >>> singularize_noun("cups")
+    'cup'
+
+    >>> singularize_noun("pints")
+    'pint'
+
+    >>> singularize_noun("g")
+    'g'
+    """
+    if p.singular_noun(noun) == False:
+      return noun
+    return p.singular_noun(noun)
