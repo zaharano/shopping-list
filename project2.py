@@ -4,6 +4,7 @@ from termcolor import colored, cprint
 from simple_term_menu import TerminalMenu
 from utils import convert_to_pint_unit, pluralize, singularize
 from ingredient_categorizer import categorize_ingredient
+from pint import Unit
 
 DEBUG_MODE = True
 
@@ -55,21 +56,19 @@ class ShoppingList:
       raise TypeError("No item to add.")
     try:
       new_item = Ingredient(item.strip())
-    except:
+    except Exception as e:
       raise ParseException("Couldn't parse that item. Please try again.")
     # Apply the coefficient if there is one
     if coeff != 1:
       try:
         new_item = new_item * coeff
-      except:
-        pass
+      except Exception as e:
+        cprint(e, 'red')
     if self.existing_item(new_item):
       return
     self._items.append(new_item)
  
-  # if ingredient with same name exists, add the quantity (or use the new amount there is none)
-  # longterm TODO: account for singular/plural of units and ingredients
-  # longterm TODO: smarter units - conversion, preferred unit for shopping, etc
+  # if ingredient with same name exists, attempt to add them
   # longterm TODO: account for different ways of writing the same ingredient
   def existing_item(self, new_item):
     for i in self._items:
@@ -77,35 +76,15 @@ class ShoppingList:
         # if they have pint units, try to add them
         # TODO: fix that this is only one confirmed pint unit
         try:
-          if i.unit.is_compatible_with(new_item.unit):
-            existing = i.unit * float(i.quantity)
-            new = new_item.unit * float(new_item.quantity)
-            i.quantity = str((existing + new).magnitude)
-            return True
-        except:
-          pass 
-
-        # if they are not pint units, compare the unit strings
-        if i.unit and new_item.unit:
-          if i.unit == new_item.unit:
-            i.quantity = str(float(i.quantity) + float(new_item.quantity))
-            return True
-
-        # if there are no units, just add the quantity
-        if not i.unit and not new_item.unit:
-          i.quantity = str(float(i.quantity) + float(new_item.quantity))
+          i = i + new_item
           return True
-
-        cprint(f"Same ingredient but incompatible units {i.name} - {i.unit} and {new_item.unit}. This program doesn't support this conversion. Keeping existing amount - you can manually add this item again using the existing unit to add more to your list!", 'red')
-        return True
-
+        except ValueError or TypeError as e:
+          print("fuck" + e)
+          return True
     return False
     
   def remove_item(self, index):
-    try:
-      del self._items[int(index)]
-    except:
-      raise Exception("Couldn't remove that item. Please try again.", 'red')
+    del self._items[int(index)]
 
   def add_recipe(self, recipe):
     # TODO: don't append recipe if it's already there
@@ -167,8 +146,8 @@ class Ingredient:
     # convert unit to pint unit for easy conversion and comparison
     try:
       self._parsed.amount[0].unit = convert_to_pint_unit(self._parsed.amount[0].unit)
-    except:
-      pass
+    except Exception as e:
+      cprint(e, 'red')
 
   # string overload formats the ingredient
   def __str__(self):
@@ -179,7 +158,11 @@ class Ingredient:
       text = text + ' (' + self.preparation + ')'
     return text
 
+  # longterm TODO: account for change to singular/plural of units and ingredients
+  # longterm TODO: smarter units - conversion, preferred unit for shopping, etc
   # overload the * operator to multiply the quantity of the ingredient
+  # TypeError if the multiplier is not a number
+  # Returns the ingredient as is if it has no quantity to multiply
   def __mul__(self, other):
     if type(other) != int and type(other) != float:
       raise TypeError("Can only multiply by a number.")
@@ -189,7 +172,29 @@ class Ingredient:
         self.quantity = str(f'{(float(self.quantity) * coeff):.2g}')
     return self
 
-  __rmul__ = __mul__
+  # overload the + operator to add the quantity of the ingredient
+  # relies on both ingredients having compatible pint.Units OR both having the same string unit
+  # resulting ingredient will have the unit of the first ingredient
+  def __add__(self, other):
+    if type(other) != Ingredient:
+      raise TypeError("Can only add an Ingredient to an Ingredient.")
+    if singularize(self.name) != singularize(other.name):
+      raise ValueError("Can only add ingredients with the same name.")
+    if not self.quantity or not other.quantity:
+      raise ValueError("Both ingredients must have a quantity to add them.")
+    if type(self.unit) == Unit and type(other.unit) == Unit:
+      if self.unit.is_compatible_with(other.unit):
+        a = self.unit * float(self.quantity)
+        b = other.unit * float(other.quantity)
+        self.quantity = str((a + b).magnitude)
+    elif type(self.unit) == str and type(other.unit) == str:
+      if self.unit == other.unit:
+        self.quantity = str(float(self.quantity) + float(other.quantity))
+    elif not self.unit and not other.unit:
+      self.quantity = str(float(self.quantity) + float(other.quantity))
+    else:
+      raise ValueError("Can't add ingredients with incompatible units.")
+    return self
 
   @property
   def name(self):
