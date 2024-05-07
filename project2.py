@@ -2,7 +2,7 @@ from ingredient_parser import parse_ingredient
 from recipe_scrapers import scrape_me
 from termcolor import colored, cprint
 from simple_term_menu import TerminalMenu
-from utils import convert_to_pint_unit
+from utils import convert_to_pint_unit, pluralize, singularize
 from ingredient_categorizer import categorize_ingredient
 
 DEBUG_MODE = True
@@ -18,6 +18,24 @@ class ShoppingList:
     lines = []
     for item in self._items:
       lines.append(str(item))
+    return '\n'.join(lines)
+
+  def categorized_items(self):
+    categories = {}
+    for item in self._items:
+      if item.category not in categories:
+        categories[item.category] = []
+      categories[item.category].append(item)
+    return categories
+
+  def string_categorized_items(self):
+    categories = self.categorized_items()
+    lines = []
+    for category, items in categories.items():
+      lines.append(f'{category.upper()}:')
+      for item in items:
+        lines.append(str(item))
+      lines.append('')
     return '\n'.join(lines)
 
   @property
@@ -54,7 +72,7 @@ class ShoppingList:
   # longterm TODO: account for different ways of writing the same ingredient
   def existing_item(self, new_item):
     for i in self._items:
-      if i.name == new_item.name:
+      if singularize(i.name) == singularize(new_item.name):
         # if they have pint units, try to add them
         # TODO: fix that this is only one confirmed pint unit
         try:
@@ -136,6 +154,11 @@ class Recipe:
 
 # TODO: figure out if I can extend ParsedIngredient class from the lib?
 class Ingredient:
+  """
+  A class to represent an ingredient.
+
+  Given a string (hopefully an ingredient string), it will parse the string using the ingredient_parser library, provide some simple ways to interact with that parsed data. It will also categorize the ingredient using the ingredient_categorizer.
+  """
   def __init__(self, text):
     self._sentence = text
     self._parsed = parse_ingredient(text)
@@ -146,6 +169,7 @@ class Ingredient:
     except:
       pass
 
+  # string overload formats the ingredient
   def __str__(self):
     text = self.name
     if self.amount:
@@ -234,6 +258,86 @@ def item_select(items):
     return -1
   return menu_entry_index
 
+def add_recipe_by_url():
+  url = input("Enter the URL of the recipe: ")
+  try: 
+    scraper = scrape_me(url)
+  except: 
+    cprint("Couldn't find or parse the recipe at that URL. Please try a different one!", 'red')
+    return
+  coeff = 1
+  if scraper.yields() != None:
+    servings_text = colored(" " + scraper.yields() + " ", 'green', attrs=['reverse', 'blink'])
+    print(f'Mmmm, {scraper.title()}. It looks like this recipe yields {servings_text}. Do you modify the yield (ie double, halve, etc) ')
+    coeff_menu = TerminalMenu(['No change', 'Halve', 'Double', 'Triple', 'Custom'])
+    coeffs = [1, 0.5, 2, 3]
+    coeff_index = coeff_menu.show()
+    if coeff_index < 4:
+      coeff = coeffs[coeff_index]
+    elif coeff_index == 4:
+      while True:
+        try:
+          coeff = float(input("Enter the desired multiplier: "))
+          if coeff <= 0:
+            raise ValueError
+          if coeff == 1:
+            cprint("No change made.", 'green')
+          if coeff > 100:
+            raise ValueError
+          break
+        except:
+          cprint("Not a valid coefficient. Enter a number more than zero and less than 100.", 'red')
+  new_recipe = Recipe(scraper.title(), scraper.ingredients(), scraper.yields(), url, scraper, coeff)
+  shopping_list.add_recipe(new_recipe)
+  cprint(f"Added items from recipe. The shopping list now has {shopping_list.length()} items.", 'green')
+
+def add_items_to_list():
+  while(True):
+    item = input("Enter an item to add (enter nothing to stop adding items): ")
+    if item == '':
+      break
+    try:
+      shopping_list.add_item(item)
+      cprint(f"Added item. The shopping list now has {shopping_list.length()} items.", 'green')
+    except TypeError as e:
+      cprint(e, 'red')
+
+def remove_items_from_list():
+  while True:
+    if shopping_list.length() == 0:
+      cprint("The shopping list is empty!", 'red')
+      break
+    print('Select item to remove:')
+    index = item_select(shopping_list.items)
+    if index == -1:
+      break
+    try:
+      shopping_list.remove_item(index)
+      cprint(f"Removed item. The shopping list now has {shopping_list.length()} items.", 'green')
+    except Exception as e:
+      cprint(e, 'red')
+      break
+
+def view_list():
+  if shopping_list.length() == 0:
+    print("The shopping list is empty!")
+  else:
+    print(f'\n{shopping_list}\n')
+
+def export_list():
+  if shopping_list.length() == 0:
+    print("Nothing to export! See ya!")
+    return
+  filename = 'shopping_list.txt'
+  with open(filename, 'w') as file:
+    file.write('Shopping List\n')
+    file.write('=============\n')
+    file.write(shopping_list.string_categorized_items())
+    file.write('\n\nRecipes:\n')
+    for recipe in shopping_list.recipes:
+      file.write(str(recipe) + '\n')
+    cprint(f"Exported {shopping_list.length()} item long list to {filename}.", 'green')
+
 def main():
   OPTIONS = [
     "Add ingredients from recipe to shopping list (by URL, works with most recipe pages)", 
@@ -261,91 +365,15 @@ def main():
     # Add ingredients from recipe to shopping list
     # requests URL, scrapes recipe, adds ingredients to shopping list
     if menu_entry_index == 0:
-      url = input("Enter the URL of the recipe: ")
-      try: 
-        scraper = scrape_me(url)
-      except: 
-        cprint("Couldn't find or parse the recipe at that URL. Please try a different one!", 'red')
-        continue
-      coeff = 1
-      if scraper.yields() != None:
-        servings_text = colored(" " + scraper.yields() + " ", 'green', attrs=['reverse', 'blink'])
-        print(f'Mmmm, {scraper.title()}. It looks like this recipe yields {servings_text}. Do you modify the yield (ie double, halve, etc) ')
-        coeff_menu = TerminalMenu(['No change', 'Halve', 'Double', 'Triple', 'Custom'])
-        coeff_index = coeff_menu.show()
-        if coeff_index == 0:
-          coeff = 1
-        elif coeff_index == 1:
-          coeff = 0.5
-        elif coeff_index == 2:
-          coeff = 2
-        elif coeff_index == 3:
-          coeff = 3
-        elif coeff_index == 4:
-          while True:
-            try:
-              coeff = float(input("Enter the desired multiplier: "))
-              if coeff <= 0:
-                raise ValueError
-              if coeff == 1:
-                cprint("No change made.", 'green')
-              if coeff > 100:
-                raise ValueError
-              break
-            except:
-              cprint("Not a valid coefficient. Enter a number more than zero and less than 100.", 'red')
-      new_recipe = Recipe(scraper.title(), scraper.ingredients(), scraper.yields(), url, scraper, coeff)
-      shopping_list.add_recipe(new_recipe)
-      cprint(f"Added items from recipe. The shopping list now has {shopping_list.length()} items.", 'green')
-
-
+      add_recipe_by_url()
     elif menu_entry_index == 1:
-      while(True):
-        item = input("Enter an item to add (enter nothing to stop adding items): ")
-        if item == '':
-          break
-        try:
-          shopping_list.add_item(item)
-          cprint(f"Added item. The shopping list now has {shopping_list.length()} items.", 'green')
-        except TypeError as e:
-          cprint(e, 'red')
-
+      add_items_to_list()
     elif menu_entry_index == 2:
-      while True:
-        if shopping_list.length() == 0:
-          cprint("The shopping list is empty!", 'red')
-          break
-        print('Select item to remove:')
-        index = item_select(shopping_list.items)
-        if index == -1:
-          break
-        try:
-          shopping_list.remove_item(index)
-          cprint(f"Removed item. The shopping list now has {shopping_list.length()} items.", 'green')
-        except Exception as e:
-          cprint(e, 'red')
-          break
-
+      remove_items_from_list()
     elif menu_entry_index == 3:
-      if shopping_list.length() == 0:
-        print("The shopping list is empty!")
-      else:
-        print(f'\n{shopping_list}\n')
-
+      view_list()
     elif menu_entry_index == 4:
-      if shopping_list.length() == 0:
-        print("Nothing to export! See ya!")
-        break
-      filename = 'shopping_list.txt'
-      with open(filename, 'w') as file:
-        file.write('Shopping List\n')
-        file.write('=============\n\n')
-        file.write('Items:\n')
-        file.write(str(shopping_list))
-        file.write('\n\nRecipes:\n')
-        for recipe in shopping_list.recipes:
-          file.write(str(recipe) + '\n')
-        cprint(f"Exported {shopping_list.length()} item long list to {filename}.", 'green')
+      export_list()
       return 0
 
     # DEBUG OPTIONS
@@ -358,12 +386,3 @@ def main():
 
 if __name__ == "__main__":
   main()
-  # one = Ingredient('1 cup of flour')
-  # two = Ingredient('2 cup of flour')
-
-  # thing = float(one.amount.quantity) * one.amount.unit
-  # bass = float(two.amount.quantity) * two.amount.unit
-
-  # added = thing + bass
-
-  # print(added.magnitude)
