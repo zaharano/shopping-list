@@ -7,7 +7,8 @@ from ingredient_categorizer import categorize_ingredient
 
 DEBUG_MODE = True
 
-#TODO: Fix the existing_item method
+# adding items leads to .0 stuff
+# plurality upon adding
 
 class ShoppingList:
   def __init__(self, items = []):
@@ -258,7 +259,7 @@ def item_select(items):
     return -1
   return menu_entry_index
 
-def add_recipe_by_url():
+def add_recipe_by_url(shopping_list):
   url = input("Enter the URL of the recipe: ")
   try: 
     scraper = scrape_me(url)
@@ -291,7 +292,7 @@ def add_recipe_by_url():
   shopping_list.add_recipe(new_recipe)
   cprint(f"Added items from recipe. The shopping list now has {shopping_list.length()} items.", 'green')
 
-def add_items_to_list():
+def add_items_to_list(shopping_list):
   while(True):
     item = input("Enter an item to add (enter nothing to stop adding items): ")
     if item == '':
@@ -302,7 +303,7 @@ def add_items_to_list():
     except TypeError as e:
       cprint(e, 'red')
 
-def remove_items_from_list():
+def remove_items_from_list(shopping_list):
   while True:
     if shopping_list.length() == 0:
       cprint("The shopping list is empty!", 'red')
@@ -318,13 +319,13 @@ def remove_items_from_list():
       cprint(e, 'red')
       break
 
-def view_list():
+def view_list(shopping_list):
   if shopping_list.length() == 0:
     print("The shopping list is empty!")
   else:
     print(f'\n{shopping_list}\n')
 
-def export_list():
+def export_list(shopping_list):
   if shopping_list.length() == 0:
     print("Nothing to export! See ya!")
     return
@@ -365,15 +366,15 @@ def main():
     # Add ingredients from recipe to shopping list
     # requests URL, scrapes recipe, adds ingredients to shopping list
     if menu_entry_index == 0:
-      add_recipe_by_url()
+      add_recipe_by_url(shopping_list)
     elif menu_entry_index == 1:
-      add_items_to_list()
+      add_items_to_list(shopping_list)
     elif menu_entry_index == 2:
-      remove_items_from_list()
+      remove_items_from_list(shopping_list)
     elif menu_entry_index == 3:
-      view_list()
+      view_list(shopping_list)
     elif menu_entry_index == 4:
-      export_list()
+      export_list(shopping_list)
       return 0
 
     # DEBUG OPTIONS
