@@ -6,13 +6,8 @@ from utils import convert_to_pint_unit, pluralize, singularize
 from ingredient_categorizer import categorize_ingredient
 from pint import Unit
 
-# order the categorized export
 # move categorizer into main file for submit
 # write some tests
-# jalapeno pepperss, 10 (seeds and ribs removed, chopped)
-# rosemary, 12 sprig (leaves stripped and bruised)
-# garlic, 18 clove (crushed)
-# cilantro, 4 bunch
 
 DEBUG_MODE = True
 
