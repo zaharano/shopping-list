@@ -6,6 +6,14 @@ from utils import convert_to_pint_unit, pluralize, singularize
 from ingredient_categorizer import categorize_ingredient
 from pint import Unit
 
+# order the categorized export
+# move categorizer into main file for submit
+# write some tests
+# jalapeno pepperss, 10 (seeds and ribs removed, chopped)
+# rosemary, 12 sprig (leaves stripped and bruised)
+# garlic, 18 clove (crushed)
+# cilantro, 4 bunch
+
 DEBUG_MODE = True
 
 STOP_INPUTS = ['', None, ' ', 'stop', 'exit', 'quit']
@@ -21,6 +29,7 @@ GROCERY_STORE_ORDER = [
   'dairy', 
   'bread', 
   'frozen',
+  'misc'
 ]
 
 # feedback colors
@@ -28,10 +37,6 @@ ERR = 'red'
 WARN = 'yellow'
 INFO = 'cyan'
 GOOD = 'green'
-
-# order the categorized export
-# move categorizer into main file for submit
-# write some tests
 
 def main():
   OPTIONS = [
@@ -112,13 +117,17 @@ class ShoppingList:
       if item.category not in categories:
         categories[item.category] = []
       categories[item.category].append(item)
-    return categories
+    sorted_categories = {}
+    for category in GROCERY_STORE_ORDER:
+      if category in categories:
+        sorted_categories[category] = categories[category]
+    return sorted_categories
 
   def string_categorized_items(self):
     categories = self.categorized_items()
     lines = []
     for category, items in categories.items():
-      lines.append(f'{category.upper()}:')
+      lines.append(f'{category.upper().replace('_', ' ')}:')
       for item in items:
         lines.append(str(item))
       lines.append('')
@@ -305,8 +314,16 @@ class Ingredient:
     text = self.name
     if self.amount:
       text = text + ', ' + self.amount.text
-    if self.preparation:
-      text = text + ' (' + self.preparation + ')'
+    if self.preparation or self.comment or self.amount_two:
+      paren_text = []
+      if self.preparation:
+        paren_text.append(self.preparation)
+      if self.amount_two:
+        paren_text.append(self.amount_two.text)
+      if self.comment:
+        # remove parens from comments where they have been retained
+        paren_text.append(self.comment.replace('(', '').replace(')', ''))
+      text = text + ' (' + ", ".join(paren_text) + ')'
     return text
 
   # longterm TODO: account for change to singular/plural of units and ingredients
@@ -358,11 +375,19 @@ class Ingredient:
   def sentence(self):
     return self._sentence
 
-  # this assumes there's only one useful amount - might need to change
+  # assumes no more than two amounts
+  # and that the second one doesn't change when multiplying etc
   @property
   def amount(self):
     if self._parsed.amount:
       return self._parsed.amount[0]
+    return None
+
+  # seen this used for sizing pieces of meat, good info for parenthetical
+  @property
+  def amount_two(self):
+    if len(self._parsed.amount) > 1:
+      return self._parsed.amount[1]
     return None
 
   @property
