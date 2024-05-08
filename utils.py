@@ -264,7 +264,7 @@ def pluralize(noun: str, count: float | int = 0) -> str:
     return p.plural(noun, count)
 
 def singularize(noun: str) -> str:
-    """Return the singular form of a noun, from inflect engine.
+    """Return the singular form of a noun, from inflect engine. If inflect engine determines the noun is already singular, return the input noun.
 
     Parameters
     ----------
@@ -277,15 +277,5 @@ def singularize(noun: str) -> str:
 
     Examples
     --------
-    >>> singularize_noun("cups")
-    'cup'
-
-    >>> singularize_noun("pints")
-    'pint'
-
-    >>> singularize_noun("g")
-    'g'
     """
-    if p.singular_noun(noun) == False:
-      return noun
-    return p.singular_noun(noun)
+    return p.singular_noun(noun) or noun
