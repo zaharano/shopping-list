@@ -12,7 +12,7 @@ STOP_INPUTS = ['', None, ' ', 'stop', 'exit', 'quit']
 
 # the order I go thru my grocery store!
 GROCERY_STORE_ORDER = [
-  'you_probably_have', 
+  'you_probably_already_have', 
   'produce', 
   'meat', 
   'seafood', 
