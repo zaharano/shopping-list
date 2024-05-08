@@ -1,5 +1,5 @@
 import pytest
-from project2 import Ingredient, ShoppingList
+from project import Ingredient, ShoppingList
 
 def test_ingredient_addition():
     x = Ingredient("1 cup flour")
