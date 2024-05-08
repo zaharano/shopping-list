@@ -3,3 +3,6 @@ shopping_list.txt
 
 # cache
 *.pyc
+
+# notes
+notes.js
