@@ -10,15 +10,26 @@ DEBUG_MODE = True
 
 STOP_INPUTS = ['', None, ' ', 'stop', 'exit', 'quit']
 
+# the order I go thru my grocery store!
+GROCERY_STORE_ORDER = [
+  'you_probably_have', 
+  'produce', 
+  'meat', 
+  'seafood', 
+  'pantry',
+  'baking',
+  'dairy', 
+  'bread', 
+  'frozen',
+]
+
 # feedback colors
 ERR = 'red'
 WARN = 'yellow'
 INFO = 'cyan'
 GOOD = 'green'
 
-# adding items leads to .0 stuff
-# plurality upon adding
-# errors / handling in add_item, existing_item, elsewhere
+# order the categorized export
 # move categorizer into main file for submit
 # write some tests
 
@@ -43,7 +54,7 @@ def main():
   shopping_list = ShoppingList()
 
   while(True):
-    terminal_menu = TerminalMenu(OPTIONS, status_bar="Items: " + str(shopping_list.length()) + " | Recipes: " + str(len(shopping_list.recipes)))
+    terminal_menu = TerminalMenu(OPTIONS, status_bar="Items: " + str(shopping_list.length) + " | Recipes: " + str(len(shopping_list.recipes)))
     menu_entry_index = terminal_menu.show()
 
     if menu_entry_index == 0:
@@ -65,6 +76,10 @@ def main():
         continue
       print(shopping_list._items[select].parsed)
       print(shopping_list._items[select])
+      
+    elif menu_entry_index == None:
+      cprint("Exiting...", GOOD)
+      break
 
 class ShoppingList:
   '''
@@ -117,6 +132,7 @@ class ShoppingList:
   def recipes(self):
     return self._recipes
 
+  @property
   def length(self):
     return len(self._items)
 
@@ -129,9 +145,12 @@ class ShoppingList:
       raise TypeError("No item to add.")
     try:
       new_item = Ingredient(item.strip())
+    # bringing together all potential parsing errors
     except Exception as e:
-      raise ParseException(f"Couldn't parse that item - {item}. Please try again.")
+      raise ParseException(f"Couldn't parse that item - {item}.")
     if coeff != 1:
+      # choosing not to choke on coeff not working right - yet
+      # eventually exception handling raised out of class methods
       try:
         new_item = new_item * coeff
       except Exception as e:
@@ -273,11 +292,13 @@ class Ingredient:
     self._sentence = text
     self._parsed = parse_ingredient(text)
     self._category = categorize_ingredient(self.name)
+    self._modified = False
     # convert unit to pint unit for easy conversion and comparison
     try:
-      self._parsed.amount[0].unit = convert_to_pint_unit(self._parsed.amount[0].unit)
+      if self._parsed.amount:
+        self._parsed.amount[0].unit = convert_to_pint_unit(self._parsed.amount[0].unit)
     except Exception as e:
-      cprint(e, 'red')
+      cprint(e, ERR)
 
   # string overload formats the ingredient
   def __str__(self):
@@ -295,11 +316,12 @@ class Ingredient:
   # Returns the ingredient as is if it has no quantity to multiply
   def __mul__(self, other):
     if type(other) != int and type(other) != float:
-      raise TypeError("Can only multiply by a number.")
+      raise TypeError("Can only multiply an Ingredient by a number.")
     if self.amount:
       if self.quantity:
         coeff = float(other)
         self.quantity = str(f'{(float(self.quantity) * coeff):.2g}')
+        self._modified = True
     return self
 
   # overload the + operator to add the quantity of the ingredient
@@ -318,14 +340,14 @@ class Ingredient:
         b = other.unit * float(other.quantity)
         self.quantity = str((a + b).magnitude)
       else:
-        raise ValueError("Can't add ingredients with incompatible units.")
+        raise ValueError(f"Can't add ingredients with incompatible units. Attempted to add {self.unit} and {other.unit} for {self.name}. Such conversions will be implemented in the future.")
     elif type(self.unit) == str and type(other.unit) == str:
       if self.unit == other.unit:
         self.quantity = str(float(self.quantity) + float(other.quantity))
     elif not self.unit and not other.unit:
       self.quantity = str(float(self.quantity) + float(other.quantity))
     else:
-      raise ValueError("Can't add ingredients with incompatible units.")
+      raise ValueError(f"Can't add ingredients with incompatible units. Attempted to add {self.unit} and {other.unit} for {self.name}. Such conversions will be implemented in the future.")
     return self
 
   @property
@@ -357,13 +379,17 @@ class Ingredient:
 
   @quantity.setter
   def quantity(self, value):
-    if self._parsed.amount and self._parsed.amount[0] and self._parsed.amount[0].quantity:
+    if self.amount and self.quantity:
       self._parsed.amount[0].quantity = f'{float(value):.2g}'
       new_text = []
-      new_text.append(value)
-      if self.amount.unit:
-        new_text.append(str(self.amount.unit))
+      new_text.append(self.quantity)
+      if self.unit:
+        new_text.append(pluralize(str(self.unit), float(self.quantity)))
+      else:
+        self._parsed.name.text = pluralize(self.name, float(self.quantity))
       self._parsed.amount[0].text = ' '.join(new_text)
+      self._modified = True
+
 
   @property
   def preparation(self):
@@ -400,16 +426,16 @@ def item_select(items):
 # requests URL, scrapes recipe, adds ingredients to shopping list
 def add_recipe_by_url(shopping_list):
   url = input("Enter the URL of the recipe: ")
-  if item in STOP_INPUTS:
+  if url in STOP_INPUTS:
     return
   try: 
     scraper = scrape_me(url)
   except: 
-    cprint("Couldn't find or parse the recipe at that URL. Please try a different one!", 'red')
+    cprint("Couldn't find or parse the recipe at that URL. Please try a different one!", ERR)
     return
   coeff = 1
   if scraper.yields() != None:
-    servings_text = colored(" " + scraper.yields() + " ", 'green', attrs=['reverse', 'blink'])
+    servings_text = colored(" " + scraper.yields() + " ", GOOD, attrs=['reverse', 'blink'])
     print(f'Mmmm, {scraper.title()}. It looks like this recipe yields {servings_text}. Do you modify the yield (ie double, halve, etc) ')
     coeff_menu = TerminalMenu(['No change', 'Halve', 'Double', 'Triple', 'Custom'])
     coeffs = [1, 0.5, 2, 3]
@@ -423,18 +449,18 @@ def add_recipe_by_url(shopping_list):
           if coeff <= 0:
             raise ValueError
           if coeff == 1:
-            cprint("No change made.", 'green')
+            cprint("No change made.", GOOD)
           if coeff > 100:
             raise ValueError
           break
         except:
-          cprint("Not a valid coefficient. Enter a number more than zero and less than 100.", 'red')
+          cprint("Not a valid coefficient. Enter a number more than zero and less than 100.", ERR)
   new_recipe = Recipe(scraper.title(), scraper.ingredients(), scraper.yields(), url, scraper, coeff)
   result = shopping_list.add_recipe(new_recipe)
   if result == 1:
-    cprint(f"There were issues adding some ingredients from the recipe. The shopping list now has {shopping_list.length()} items", 'yellow')
+    cprint(f"There were issues adding some ingredients from the recipe. The shopping list now has {shopping_list.length} items", WARN)
   else:
-    cprint(f"Added items from recipe. The shopping list now has {shopping_list.length()} items.", 'green')
+    cprint(f"Added items from recipe. The shopping list now has {shopping_list.length} items.", GOOD)
 
 def add_items_to_list(shopping_list):
   while(True):
@@ -442,15 +468,15 @@ def add_items_to_list(shopping_list):
     if item in STOP_INPUTS:
       break
     try:
-      if shopping_list.add_item(item) == 0:
-        cprint(f"Added item. The shopping list now has {shopping_list.length()} items.", 'green')
-    except TypeError as e:
-      cprint(e, 'red')
+      shopping_list.add_item(item)
+      cprint(f"Added item. The shopping list now has {shopping_list.length} items.", GOOD)
+    except Exception as e:
+      cprint(e, ERR)
 
 def remove_items_from_list(shopping_list):
   while True:
-    if shopping_list.length() == 0:
-      cprint("The shopping list is empty!", 'red')
+    if shopping_list.length == 0:
+      cprint("The shopping list is empty!", ERR)
       break
     print('Select item to remove:')
     index = item_select(shopping_list.items)
@@ -458,19 +484,19 @@ def remove_items_from_list(shopping_list):
       break
     try:
       shopping_list.remove_item(index)
-      cprint(f"Removed item. The shopping list now has {shopping_list.length()} items.", 'green')
+      cprint(f"Removed item. The shopping list now has {shopping_list.length} items.", GOOD)
     except Exception as e:
-      cprint(e, 'red')
+      cprint(e, ERR)
       break
 
 def view_list(shopping_list):
-  if shopping_list.length() == 0:
+  if shopping_list.length == 0:
     print("The shopping list is empty!")
   else:
     print(f'\n{shopping_list}\n')
 
 def export_list(shopping_list):
-  if shopping_list.length() == 0:
+  if shopping_list.length == 0:
     print("Nothing to export! See ya!")
     return
   filename = 'shopping_list.txt'
@@ -481,7 +507,7 @@ def export_list(shopping_list):
     file.write('\n\nRecipes:\n')
     for recipe in shopping_list.recipes:
       file.write(str(recipe) + '\n')
-    cprint(f"Exported {shopping_list.length()} item long list to {filename}.", 'green')
+    cprint(f"Exported {shopping_list.length} item long list to {filename}.", GOOD)
 
 if __name__ == "__main__":
   main()
