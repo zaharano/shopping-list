@@ -1,4 +1,5 @@
 import inflect
+from utils import singularize, pluralize
 
 p = inflect.engine()
 
@@ -144,7 +145,7 @@ you_probably_have = ['water', 'salt', 'kosher salt', 'pepper', 'black pepper', '
 # dairy, sauces, canned, baking, snacks, beverages, frozen, misc
 
 grocer_categories = {
-    'you_probably_have': [*you_probably_have],
+    'you_probably_already_have': [*you_probably_have],
     'produce': [*fruit, *vegetables],
     'meat': [*poultry, *red_meat, *game_meat,],
     'seafood': [*fresh_seafood],
@@ -159,7 +160,6 @@ grocer_categories = {
 #TODO: preferred returns etc etc.
 def categorize_ingredient(ingredient, unit = None):
   for category, items in grocer_categories.items():
-    pluralized = [p.plural(i) for i in items]
-    if ingredient.lower() in items or ingredient in pluralized:
+    if ingredient.lower() in items or singularize(ingredient.lower()) in items:
       return category
   return 'misc'
