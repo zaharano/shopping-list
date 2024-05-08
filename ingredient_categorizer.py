@@ -98,6 +98,7 @@ other_cheeses = ['cheese', 'blue cheese', 'goat cheese', 'fior di latte', 'queso
 # cheeses that can be with or without 'cheese' at the end, then all others
 all_cheeses =  cheeses + [c + ' cheese' for c in cheeses] + other_cheeses
 
+eggs = ['egg', 'chicken egg', 'duck egg', 'goose egg', 'quail egg', 'ostrich egg', 'emu egg', 'egg white', 'egg yolk', 'egg substitute', 'egg replacer']
 
 # going to need to use the unit 'can' to determine if it's canned vs dry
 # also plurality will be odd I think
@@ -129,22 +130,29 @@ chocolates = ['chocolate', 'bittersweet chocolate', 'semisweet chocolate', 'dark
 baking = [*flours, *sugars, *leaveners, *chocolates]
 
 ### Spices and dried herbs
-spices = ['spice', 'allspice', 'anise', 'annatto', 'asafoetida', 'caraway', 'cardamom', 'cayenne', 'celery seed', 'chervil', 'ground chili', 'chili powder', 'cinnamon', 'ground cinnamon', 'clove', 'ground clove', 'coriander', 'cumin', 'cumin seed', 'ground cumin', 'curry', 'curry powder', 'fennel seed', 'fenugreek seed', 'garlic powder', 'ginger powder', 'ground ginger', 'lavender', 'mustard seed', 'mustard powder', 'nutmeg', 'ground nutmeg', 'paprika', 'black pepper', 'poppy seed', 'rosemary', 'saffron', 'sage', 'savory', 'tarragon', 'thyme', 'turmeric', 'vanilla', 'wasabi', 'zaatar',]
+spices = ['spice', 'allspice', 'anise', 'annatto', 'asafoetida', 'caraway', 'cardamom', 'cayenne', 'celery seed', 'chervil',  'cinnamon', 'ground cinnamon', 'clove', 'ground clove', 'coriander', 'cumin', 'cumin seed', 'ground cumin', 'curry', 'curry powder', 'fennel seed', 'fenugreek seed', 'garlic powder', 'ginger powder', 'ground ginger', 'lavender', 'mustard seed', 'mustard powder', 'nutmeg', 'ground nutmeg', 'paprika', 'black pepper', 'poppy seed', 'rosemary', 'saffron', 'sage', 'savory', 'tarragon', 'thyme', 'turmeric', 'ground turmeric', 'turmeric powder', 'vanilla', 'wasabi', 'zaatar', 'ground fennel', 'ground fennel seed', 'fennel powder']
 dried_herbs = ['herb', 'basil', 'bay leaf', 'chervil', 'chive', 'cilantro', 'dill', 'lavender', 'lemon grass', 'marjoram', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'savory', 'tarragon', 'thyme']
+peppers = ['black pepper', 'white pepper', 'cayenne pepper', 'chipotle powder', 'ground chili', 'chili powder', 'new mexico chili powder']
 all_spices = [*spices, *dried_herbs]
+
+### Frozen foods
+frozen_veggies = ['frozen peas', 'frozen carrots', 'frozen spinach', 'frozen corn', 'frozen lima beans', 'frozen green beans', 'frozen broccoli', 'frozen cauliflower', 'frozen brussels sprouts', 'frozen mixed vegetables', 'frozen stir fry vegetables', 'frozen vegetable medley', 'frozen vegetable blend', 'frozen vegetable mix', 'frozen vegetable', 'frozen veggie', 'frozen veg', 'frozen greens', 'frozen leafy greens', 'frozen root vegetables', 'frozen squash', 'frozen bell pepper', 'frozen vegetable' ]
+frozen_fruit = ['frozen fruit', 'frozen berry', 'frozen banana', 'frozen mango', 'frozen pineapple', 'frozen peach', 'frozen apple', 'frozen pear', 'frozen cherry', 'frozen blueberry', 'frozen blackberry', 'frozen raspberry', 'frozen strawberry', 'frozen cranberry', 'frozen grape', 'frozen citrus', 'frozen orange', 'frozen lemon', 'frozen lime', 'frozen grapefruit', 'frozen tangerine', 'frozen kiwi', 'frozen tropical fruit', ]
 
 you_probably_have = ['water', 'salt', 'kosher salt', 'pepper', 'black pepper', 'salt and pepper', 'salt & pepper']
 
 # dairy, sauces, canned, baking, snacks, beverages, frozen, misc
 
 grocer_categories = {
+    'you_probably_have': [*you_probably_have],
     'produce': [*fruit, *vegetables],
     'meat': [*poultry, *red_meat, *game_meat,],
     'seafood': [*fresh_seafood],
     'bread': [*bread],
-    'dairy': [*dairy_milks, *alternative_milks, *butter, *yogurt, *sour_creams, *all_cheeses],
+    'dairy': [*dairy_milks, *alternative_milks, *butter, *yogurt, *sour_creams, *all_cheeses, *eggs],
     'pantry': [*pastas, *rices, *grains, *canned_fish, *anchovy, *beans, *vinegars, *oils, *all_spices, *sauces, *nuts, *nut_butters, *seeds, *dried_fruits, *dried_berries],
     'baking': [*baking],
+    'frozen': [*frozen_veggies, *frozen_fruit],
 }
 
 #TODO: cases where unit influences category
