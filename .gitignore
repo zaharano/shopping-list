@@ -1,2 +1,5 @@
 # output
 shopping_list.txt
+
+# cache
+*.pyc
