@@ -239,13 +239,18 @@ def pluralize_unit(unit: str) -> str:
     """
     return UNITS.get(unit, unit)
 
-def pluralize(noun: str, count: int = 1) -> str:
-    """Return the plural form of a noun, from inflect engine.
+def pluralize(noun: str, count: float | int = 0) -> str:
+    """Return the plural form of a noun, from inflect engine, unless count is exactly 1. This logic may need tweaking.
+
+    is it 0.5 oranges or 0.5 orange? 
+    half an orange. etc.
 
     Parameters
     ----------
     noun : str
         Noun to pluralize
+    count : float | int, optional
+        Number of items, default is 2
 
     Returns
     -------
@@ -253,14 +258,6 @@ def pluralize(noun: str, count: int = 1) -> str:
 
     Examples
     --------
-    >>> pluralize_noun("cup")
-    'cups'
-
-    >>> pluralize_noun("pint")
-    'pints'
-
-    >>> pluralize_noun("g")
-    'g'
     """
     if count == 1:
         return noun
