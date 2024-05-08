@@ -261,7 +261,10 @@ def pluralize(noun: str, count: float | int = 0) -> str:
     """
     if count == 1:
         return noun
-    return p.plural(noun, count)
+    if singularize(noun) == False:
+        return p.plural(noun, count)
+    return noun
+
 
 def singularize(noun: str) -> str:
     """Return the singular form of a noun, from inflect engine. If inflect engine determines the noun is already singular, return the input noun.
