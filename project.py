@@ -102,7 +102,7 @@ class ShoppingList:
       raise TypeError("Items must be a list.")
     if not all(isinstance(x, str) for x in items):
       raise TypeError("Items must be a list of strings.")
-    self._items = list(map(lambda x: Ingredient(x), items))
+    self._items = list(map(lambda x: ShoppingIngredient(x), items))
     self._recipes = []
     
   def __str__(self):
@@ -153,7 +153,7 @@ class ShoppingList:
     if not item:
       raise TypeError("No item to add.")
     try:
-      new_item = Ingredient(item.strip())
+      new_item = ShoppingIngredient(item.strip())
     # bringing together all potential parsing errors
     except Exception as e:
       raise ParseException(f"Couldn't parse that item - {item}.")
@@ -286,16 +286,23 @@ class Recipe:
     return self._coeff
 
 # TODO: figure out if I can extend ParsedIngredient class from the lib?
-class Ingredient:
+class ShoppingIngredient:
   """
   A class to represent an ingredient.
 
-  Given a string (hopefully an ingredient string), it will parse the string using the ingredient_parser library, provide some simple ways to interact with that parsed data. It will also categorize the ingredient using the ingredient_categorizer.
+  Given a string (hopefully an ingredient string, of the sort you'd typically find in the ingredients list on a recipe, which contains some or all of the tokens QUANTITY, UNIT, INGREDIENT, PREPARATION, COMMENT), upon initialization the string will be parsed using the ingredient_parser library and the parsed data is saved privately. The unit will be converted to a Pint unit, if the unit is found in the Pint unit registry. Pint units have a host of useful features including easy conversion to compatible units. The ingredient will also be categorized using the ingredient_categorizer.
+  
+  The class provides many properties to access the parsed data, with one property (quantity) being settable, which will also reset the amount text to account for the new quantity. The class also provides overloaded operators for multiplication and addition, which will multiply the quantity of the ingredient by a number or add the quantity of another ingredient to this ingredient, respectively. These operators mutate the first object in place - they do not return a fresh object. I will probably change this soon. There is also a string overload to format the ingredient for printing in a shopping list.
 
   Parameters
   ----------
   text : str
     The ingredient string to parse and categorize.
+
+  Operators
+  ---------
+  * : Multiply the quantity of the ingredient by a number.
+  + : Attempt to add the quantity of another ingredient to this ingredient. Names must match, and units must be compatible, which is done either via pint Unit compatability or string matching.
   """
   def __init__(self, text):
     self._sentence = text
@@ -345,7 +352,7 @@ class Ingredient:
   # relies on both ingredients having compatible pint.Units OR both having the same string unit
   # resulting ingredient will have the unit of the first ingredient
   def __add__(self, other):
-    if type(other) != Ingredient:
+    if type(other) != ShoppingIngredient:
       raise TypeError("Can only add an Ingredient to an Ingredient.")
     if singularize(self.name) != singularize(other.name):
       raise ValueError("Can only add ingredients with the same name.")
@@ -460,8 +467,9 @@ def add_recipe_by_url(shopping_list):
     return
   coeff = 1
   if scraper.yields() != None:
-    servings_text = colored(" " + scraper.yields() + " ", GOOD, attrs=['reverse', 'blink'])
-    print(f'Mmmm, {scraper.title()}. It looks like this recipe yields {servings_text}. Do you modify the yield (ie double, halve, etc) ')
+    title_text = colored(scraper.title(), GOOD, attrs=['reverse'])
+    servings_text = colored(scraper.yields(), GOOD, attrs=['reverse'])
+    print(f'Mmmm, {title_text}. It looks like this recipe yields {servings_text}.\nWould you like to modify the yield (ie double, halve, etc) ')
     coeff_menu = TerminalMenu(['No change', 'Halve', 'Double', 'Triple', 'Custom'])
     coeffs = [1, 0.5, 2, 3]
     coeff_index = coeff_menu.show()
@@ -529,9 +537,10 @@ def export_list(shopping_list):
     file.write('Shopping List\n')
     file.write('=============\n')
     file.write(shopping_list.string_categorized_items())
-    file.write('\n\nRecipes:\n')
-    for recipe in shopping_list.recipes:
-      file.write(str(recipe) + '\n')
+    if shopping_list.recipes:
+      file.write('\n\nRecipes:\n')
+      for recipe in shopping_list.recipes:
+        file.write(str(recipe) + '\n')
     cprint(f"Exported {shopping_list.length} item long list to {filename}.", GOOD)
 
 # these are here to create tests for cs50p submit
@@ -540,8 +549,6 @@ def add_ingredients(ingredient1, ingredient2):
 
 def multiply_ingredient(ingredient, coeff):
   return ingredient * coeff
-
-
 
 
 ############################################
@@ -748,16 +755,18 @@ def singularize_unit(unit: str) -> str:
 
     Examples
     --------
-    >>> singularize("cups")
+    >>> singularize_unit("cups")
     'cup'
 
-    >>> singularize("pints")
+    >>> singularize_unit("pints")
     'pint'
 
-    >>> singularize("g")
+    >>> singularize_unit("g")
     'g'
     """
     return UNITS.get(unit, unit)
+
+    
 
 def pluralize_unit(unit: str) -> str:
     """Return the plural form of a unit, if it exists in the UNITS dictionary.
@@ -774,16 +783,19 @@ def pluralize_unit(unit: str) -> str:
 
     Examples
     --------
-    >>> pluralize("cup")
+    >>> pluralize_unit("cup")
     'cups'
 
-    >>> pluralize("pint")
+    >>> pluralize_unit("pint")
     'pints'
 
-    >>> pluralize("g")
+    >>> pluralize_unit("g")
     'g'
     """
-    return UNITS.get(unit, unit)
+    for k, v in UNITS.items():
+      if v == unit:
+        return k
+    return unit
 
 def pluralize(noun: str, count: float | int = 0) -> str:
     """Return the plural form of a noun, from inflect engine, unless count is exactly 1. This logic may need tweaking.
@@ -975,7 +987,7 @@ all_spices = [*spices, *dried_herbs, *peppers]
 frozen_veggies = ['frozen peas', 'frozen carrots', 'frozen spinach', 'frozen corn', 'frozen lima beans', 'frozen green beans', 'frozen broccoli', 'frozen cauliflower', 'frozen brussels sprouts', 'frozen mixed vegetables', 'frozen stir fry vegetables', 'frozen vegetable medley', 'frozen vegetable blend', 'frozen vegetable mix', 'frozen vegetable', 'frozen veggie', 'frozen veg', 'frozen greens', 'frozen leafy greens', 'frozen root vegetables', 'frozen squash', 'frozen bell pepper', 'frozen vegetable' ]
 frozen_fruit = ['frozen fruit', 'frozen berry', 'frozen banana', 'frozen mango', 'frozen pineapple', 'frozen peach', 'frozen apple', 'frozen pear', 'frozen cherry', 'frozen blueberry', 'frozen blackberry', 'frozen raspberry', 'frozen strawberry', 'frozen cranberry', 'frozen grape', 'frozen citrus', 'frozen orange', 'frozen lemon', 'frozen lime', 'frozen grapefruit', 'frozen tangerine', 'frozen kiwi', 'frozen tropical fruit', ]
 
-you_probably_have = ['water', 'salt', 'kosher salt', 'pepper', 'black pepper', 'salt and pepper', 'salt & pepper', 'kosher salt and black pepper']
+you_probably_have = ['water', 'oil', 'olive oil', 'extra virgin olive oil', 'evoo', 'extra-virgin olive oil', 'cooking oil', 'salt', 'kosher salt', 'pepper', 'black pepper', 'salt and pepper', 'salt & pepper', 'kosher salt and black pepper']
 
 # dairy, sauces, canned, baking, snacks, beverages, frozen, misc
 
