@@ -5,6 +5,7 @@ from simple_term_menu import TerminalMenu
 # from utils import convert_to_pint_unit, pluralize, singularize
 # from ingredient_categorizer import categorize_ingredient
 from pint import Unit
+import copy
 
 # for utils.py
 import pint
@@ -170,9 +171,6 @@ class ShoppingList:
     self._items.append(new_item)
     return 0
  
-  # if ingredient with same name exists, attempt to add them
-  # return 0 if there is no existing item
-  # return 1 if existing item was added to, 2 if existing item was not added to
   # longterm TODO: account for different ways of writing the same ingredient
   def existing_item(self, new_item):
     '''
@@ -301,8 +299,8 @@ class ShoppingIngredient:
 
   Operators
   ---------
-  * : Multiply the quantity of the ingredient by a number.
-  + : Attempt to add the quantity of another ingredient to this ingredient. Names must match, and units must be compatible, which is done either via pint Unit compatability or string matching.
+  * : Multiply the quantity of the ingredient by a number. Returns the ingredient as is if it has no quantity to multiply.
+  + : Attempt to add the quantity of another ingredient to this ingredient. Names must match, and units must be compatible, which is done either via pint Unit compatability or string matching. The existing ingredient will have its quantity and unit updated to reflect the sum. If two ingredients with compatible but not equal Pint units are added, the unit that results in  the smaller whole magnitude (>= 1) will be used for the sum.
   """
   def __init__(self, text):
     self._sentence = text
@@ -333,10 +331,7 @@ class ShoppingIngredient:
       text = text + ' (' + ", ".join(paren_text) + ')'
     return text
 
-  # longterm TODO: account for change to singular/plural of units and ingredients
   # longterm TODO: smarter units - conversion, preferred unit for shopping, etc
-  # overload the * operator to multiply the quantity of the ingredient
-  # TypeError if the multiplier is not a number
   # Returns the ingredient as is if it has no quantity to multiply
   def __mul__(self, other):
     if type(other) != int and type(other) != float:
@@ -344,14 +339,12 @@ class ShoppingIngredient:
     if self.amount:
       if self.quantity:
         coeff = float(other)
-        self.quantity = str(f'{(float(self.quantity) * coeff):.2g}')
+        self.quantity = str(f'{(float(self.quantity) * coeff):.3g}')
         self._modified = True
     return self
 
-  # overload the + operator to add the quantity of the ingredient
-  # relies on both ingredients having compatible pint.Units OR both having the same string unit
-  # resulting ingredient will have the unit of the first ingredient
   def __add__(self, other):
+    # new_ingredient = copy.deepcopy(self)
     if type(other) != ShoppingIngredient:
       raise TypeError("Can only add an Ingredient to an Ingredient.")
     if singularize(self.name) != singularize(other.name):
@@ -362,7 +355,12 @@ class ShoppingIngredient:
       if self.unit.is_compatible_with(other.unit):
         a = self.unit * float(self.quantity)
         b = other.unit * float(other.quantity)
-        self.quantity = str((a + b).magnitude)
+        c = a + b
+        if c.magnitude > c.to(other.unit).magnitude and c.to(other.unit).magnitude >= 1:
+          self.unit = copy.deepcopy(other.unit)
+          self.quantity = str(c.to(other.unit).magnitude)
+        else:
+          self.quantity = str(c.magnitude)
       else:
         raise ValueError(f"Can't add ingredients with incompatible units. Attempted to add {self.unit} and {other.unit} for {self.name}. Such conversions will be implemented in the future.")
     elif type(self.unit) == str and type(other.unit) == str:
@@ -403,6 +401,13 @@ class ShoppingIngredient:
       return self.amount.unit
     return None
 
+  # this needs to be better. handle different things. setting an amount should be one big setter i think.
+  @unit.setter
+  def unit(self, value):
+    if self.amount:
+      self._parsed.amount[0].unit = value
+      self._modified = True
+
   @property
   def quantity(self):
     if self.amount:
@@ -412,7 +417,7 @@ class ShoppingIngredient:
   @quantity.setter
   def quantity(self, value):
     if self.amount and self.quantity:
-      self._parsed.amount[0].quantity = f'{float(value):.2g}'
+      self._parsed.amount[0].quantity = f'{float(value):.3g}'
       new_text = []
       new_text.append(self.quantity)
       if self.unit:
@@ -879,7 +884,7 @@ leafy_greens = ['arugula', 'collard greens', 'kale', 'lettuce', 'spinach', 'swis
 cruciferous_vegetables = ['broccoli', 'brussels sprout', 'brussel', 'brussel sprout', 'cabbage', 'cauliflower', 'kohlrabi']
 alliums = ['chive', 'garlic', 'leek', 'onion', 'shallot', 'green onion', 'scallion', 'spring onion', 'ramp', 'red onion', 'white onion', 'yellow onion', 'sweet onion', 'pearl onion', 'cippolini onion', 'vidalia onion', 'walla walla onion', 'maui onion', 'elephant garlic', 'garlic scape', 'garlic chive']
 other_vegetables = ['celery', 'cucumber', 'eggplant', 'fennel', 'okra', 'pea', 'snap pea', 'snow pea', 'tomato', 'cherry tomato', 'grape tomato', 'heirloom tomato', 'roma tomato', 'beefsteak tomato', 'plum tomato', 'green tomato', 'yellow tomato', 'orange tomato', 'purple tomato', 'white tomato', 'black tomato', 'pink tomato', 'striped tomato', 'corn', 'artichoke', 'asparagus', 'snap bean', 'green bean', 'wax bean', ]
-herbs = ['basil', 'cilantro', 'dill', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'thyme']
+herbs = ['basil', 'cilantro', 'dill', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'thyme', 'fresh parsley', 'fresh flat-leaf parsley', 'fresh curly parsley', 'fresh flat-leaf or curly parsley']
 peppers = ['bell pepper', 'green bell pepper', 'red bell pepper', 'yellow bell pepper', 'orange bell pepper', 'green pepper', 'red pepper', 'orange pepper', 'jalapeno', 'jalapeño', 'jalapeno peppers', 'poblano', 'poblano peppers', 'serrano', 'serrano peppers']
 mushrooms = ['button mushroom', 'cremini mushroom', 'portobello mushroom', 'shiitake mushroom']
 vegetables = [*squashes, *root_vegetables, *leafy_greens, *cruciferous_vegetables, *alliums, *herbs, *peppers, *mushrooms, *other_vegetables]
@@ -930,7 +935,7 @@ anchovy = ['anchovy', 'canned anchovy', 'anchovy fillet', 'canned anchovy fillet
 canned_fish = ['canned tuna', 'canned salmon', 'canned sardine', 'canned mackerel', 'canned herring', 'canned trout', 'canned fish', 'canned seafood', 'canned shellfish']
 
 ## Bread
-bread = ['bread', 'baguette', 'biscuit', 'bun', 'cornbread', 'croissant', 'doughnut', 'flatbread', 'focaccia', 'hamburger bun', 'naan', 'pita', 'roll', 'sourdough', 'tortilla', 'white bread', 'whole wheat bread', 'rye bread', 'rye', 'french bread', 'italian bread', 'ciabatta', 'bagel', 'muffin']
+bread = ['bread', 'baguette', 'biscuit', 'bun', 'cornbread', 'croissant', 'doughnut', 'flatbread', 'focaccia', 'hamburger bun', 'naan', 'pita', 'roll', 'sourdough', 'tortilla', 'white bread', 'whole wheat bread', 'rye bread', 'rye', 'french bread', 'italian bread', 'ciabatta', 'bagel', 'muffin', 'white bread', 'white sandwich bread']
 pastas = ['pasta', 'angel hair', 'bowtie', 'bucatini', 'fettuccine', 'linguine', 'macaroni', 'orecchiette', 'penne', 'rigatoni', 'spaghetti', 'tortellini']
 rices = ['rice', 'arborio', 'arborio rice', 'basmati', 'basmati rice', 'black rice', 'brown rice', 'cargo rice', 'jasmine rice', 'long grain rice', 'short grain rice', 'wild rice']
 grains = ['barley', 'buckwheat', 'corn', 'millet', 'oats', 'quinoa', 'rye', 'sorghum', 'wheat']
@@ -1015,6 +1020,7 @@ def categorize_ingredient(ingredient, unit = None):
   ingredient = ingredient.lower()
   for char in DROPPED_CHARACTERS:
     ingredient = ingredient.replace(char, '')
+  
   for category, items in grocer_categories.items():
     if ingredient in items or singularize(ingredient) in items:
       return category
@@ -1028,10 +1034,13 @@ def categorize_ingredient_broadly(ingredient, unit = None):
   ingredient = ingredient.lower()
   for char in DROPPED_CHARACTERS:
     ingredient = ingredient.replace(char, '')
-  for category, items in grocer_categories.items():
-    for item in items:
-      if item in ingredient or item in singularize(ingredient):
-        return category
+  split = [ingredient] + ingredient.split('or')
+  for i in split:
+    i = i.strip()
+    for category, items in grocer_categories.items():
+      for item in items:
+        if item in ingredient or item in singularize(ingredient):
+          return category
   return 'misc'
 
 
