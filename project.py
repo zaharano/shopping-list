@@ -23,7 +23,7 @@ GROCERY_STORE_ORDER = [
   'seafood', 
   'pantry',
   'baking',
-  'dairy', 
+  'dairy_and_eggs', 
   'bread', 
   'frozen',
   'misc'
@@ -535,7 +535,7 @@ def view_list(shopping_list):
   if shopping_list.length == 0:
     print("The shopping list is empty!")
   else:
-    print(f'\n{shopping_list}\n')
+    print(f'\n{shopping_list.string_categorized_items()}\n')
 
 def export_list(shopping_list):
   if shopping_list.length == 0:
@@ -996,6 +996,8 @@ dried_herbs = [h + ', dried' for h in d_herbs] + ['dried ' + h for h in d_herbs]
 dried_peppers = [p + ', dried' for p in peppers] + ['dried ' + p for p in peppers] + ['white pepper', 'cayenne pepper', 'chipotle powder', 'ground chili', 'chili powder', 'new mexico chili powder', 'red-pepper', 'red-pepper flakes', 'red pepper flakes']
 all_spices = [*spices, *dried_herbs, *dried_peppers]
 
+misc_pantry = ['bread crumbs', 'breadcrumbs', 'panko', 'panko breadcrumbs']
+
 ### Frozen foods
 frozen_veggies = ['frozen peas', 'frozen carrots', 'frozen spinach', 'frozen corn', 'frozen lima beans', 'frozen green beans', 'frozen broccoli', 'frozen cauliflower', 'frozen brussels sprouts', 'frozen mixed vegetables', 'frozen stir fry vegetables', 'frozen vegetable medley', 'frozen vegetable blend', 'frozen vegetable mix', 'frozen vegetable', 'frozen veggie', 'frozen veg', 'frozen greens', 'frozen leafy greens', 'frozen root vegetables', 'frozen squash', 'frozen bell pepper', 'frozen vegetable' ]
 frozen_fruit = ['frozen fruit', 'frozen berry', 'frozen banana', 'frozen mango', 'frozen pineapple', 'frozen peach', 'frozen apple', 'frozen pear', 'frozen cherry', 'frozen blueberry', 'frozen blackberry', 'frozen raspberry', 'frozen strawberry', 'frozen cranberry', 'frozen grape', 'frozen citrus', 'frozen orange', 'frozen lemon', 'frozen lime', 'frozen grapefruit', 'frozen tangerine', 'frozen kiwi', 'frozen tropical fruit', ]
@@ -1010,7 +1012,7 @@ grocer_categories = {
     'meat': [*poultry, *red_meat, *game_meat,],
     'seafood': [*fresh_seafood],
     'bread': [*bread],
-    'dairy': [*dairy_milks, *alternative_milks, *butter, *yogurt, *sour_creams, *all_cheeses, *eggs],
+    'dairy_and_eggs': [*dairy_milks, *alternative_milks, *butter, *yogurt, *sour_creams, *all_cheeses, *eggs],
     'pantry': [*pastas, *rices, *grains, *canned_fish, *anchovy, *beans, *vinegars, *oils, *all_spices, *sauces, *nuts, *nut_butters, *seeds, *dried_fruits, *dried_berries, *canned],
     'baking': [*baking],
     'frozen': [*frozen_veggies, *frozen_fruit],
