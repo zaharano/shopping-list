@@ -941,7 +941,7 @@ canned_fish = ['canned tuna', 'canned salmon', 'canned sardine', 'canned mackere
 ## Bread
 bread = ['bread', 'baguette', 'biscuit', 'bun', 'cornbread', 'croissant', 'doughnut', 'flatbread', 'focaccia', 'hamburger bun', 'naan', 'pita', 'roll', 'sourdough', 'tortilla', 'white bread', 'whole wheat bread', 'rye bread', 'rye', 'french bread', 'italian bread', 'ciabatta', 'bagel', 'muffin', 'white bread', 'white sandwich bread']
 pastas = ['pasta', 'angel hair', 'bowtie', 'bucatini', 'fettuccine', 'linguine', 'macaroni', 'orecchiette', 'penne', 'rigatoni', 'spaghetti', 'tortellini']
-rices = ['rice', 'arborio', 'arborio rice', 'basmati', 'basmati rice', 'black rice', 'brown rice', 'cargo rice', 'jasmine rice', 'long grain rice', 'short grain rice', 'wild rice']
+rices = ['rice', 'arborio', 'arborio rice', 'basmati', 'basmati rice', 'black rice', 'brown rice', 'cargo rice', 'jasmine rice', 'long grain rice', 'short grain rice', 'wild rice', 'white rice', 'short-grain rice', 'shortgrain rice', 'long-grain rice', 'longgrain rice', 'brown basmati rice', 'white basmati rice', 'brown jasmine rice', 'white jasmine rice', 'brown cargo rice', 'white cargo rice', 'brown long grain rice', 'white long grain rice', 'brown short grain rice', 'white short grain rice', 'brown wild rice', 'white wild rice', 'brown rice', 'white rice', 'brown basmati', 'white basmati', 'brown jasmine', 'white jasmine',]
 grains = ['barley', 'buckwheat', 'corn', 'millet', 'oats', 'quinoa', 'rye', 'sorghum', 'wheat']
 
 dairy_milks = ['milk', 'whole milk', 'skim milk', '2% milk', '1% milk', 'half and half', 'cream', 'heavy cream', 'whipping cream', 'light cream', 'half and half', 'buttermilk',]
@@ -996,7 +996,7 @@ dried_herbs = [h + ', dried' for h in d_herbs] + ['dried ' + h for h in d_herbs]
 dried_peppers = [p + ', dried' for p in peppers] + ['dried ' + p for p in peppers] + ['white pepper', 'cayenne pepper', 'chipotle powder', 'ground chili', 'chili powder', 'new mexico chili powder', 'red-pepper', 'red-pepper flakes', 'red pepper flakes']
 all_spices = [*spices, *dried_herbs, *dried_peppers]
 
-misc_pantry = ['bread crumbs', 'breadcrumbs', 'panko', 'panko breadcrumbs']
+misc_pantry = ['bread crumbs', 'breadcrumbs', 'panko', 'panko breadcrumbs', 'chicken broth', 'beef broth', 'chicken stock', 'beef stock']
 
 ### Frozen foods
 frozen_veggies = ['frozen peas', 'frozen carrots', 'frozen spinach', 'frozen corn', 'frozen lima beans', 'frozen green beans', 'frozen broccoli', 'frozen cauliflower', 'frozen brussels sprouts', 'frozen mixed vegetables', 'frozen stir fry vegetables', 'frozen vegetable medley', 'frozen vegetable blend', 'frozen vegetable mix', 'frozen vegetable', 'frozen veggie', 'frozen veg', 'frozen greens', 'frozen leafy greens', 'frozen root vegetables', 'frozen squash', 'frozen bell pepper', 'frozen vegetable' ]
@@ -1013,7 +1013,7 @@ grocer_categories = {
     'seafood': [*fresh_seafood],
     'bread': [*bread],
     'dairy_and_eggs': [*dairy_milks, *alternative_milks, *butter, *yogurt, *sour_creams, *all_cheeses, *eggs],
-    'pantry': [*pastas, *rices, *grains, *canned_fish, *anchovy, *beans, *vinegars, *oils, *all_spices, *sauces, *nuts, *nut_butters, *seeds, *dried_fruits, *dried_berries, *canned],
+    'pantry': [*pastas, *rices, *grains, *canned_fish, *anchovy, *beans, *vinegars, *oils, *all_spices, *sauces, *nuts, *nut_butters, *seeds, *dried_fruits, *dried_berries, *canned, *misc_pantry],
     'baking': [*baking],
     'frozen': [*frozen_veggies, *frozen_fruit],
 }
