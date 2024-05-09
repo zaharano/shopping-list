@@ -13,8 +13,6 @@ import inflect
 # for ingredient_categorizer.py
 
 
-# move categorizer into main file for submit
-# write some tests
 
 DEBUG_MODE = True
 
@@ -536,7 +534,12 @@ def export_list(shopping_list):
       file.write(str(recipe) + '\n')
     cprint(f"Exported {shopping_list.length} item long list to {filename}.", GOOD)
 
+# these are here to create tests for cs50p submit
+def add_ingredients(ingredient1, ingredient2):
+  return ingredient1 + ingredient2
 
+def multiply_ingredient(ingredient, coeff):
+  return ingredient * coeff
 
 
 
@@ -804,7 +807,7 @@ def pluralize(noun: str, count: float | int = 0) -> str:
     """
     if count == 1:
         return noun
-    if singularize(noun) == False:
+    if p.singular_noun(noun) == False:
         return p.plural(noun, count)
     return noun
 
