@@ -11,11 +11,7 @@ import copy
 import pint
 import inflect
 
-# for ingredient_categorizer.py
-
-
-
-DEBUG_MODE = True
+DEBUG_MODE = False
 
 STOP_INPUTS = ['', None, ' ', 'stop', 'exit', 'quit']
 
@@ -41,8 +37,8 @@ GOOD = 'green'
 
 def main():
   OPTIONS = [
-    "Add ingredients from recipe to shopping list (by URL, works with most recipe pages)", 
     "Add items to shopping list", 
+    "Add ingredients from recipe to shopping list (by URL, works with most recipe pages)", 
     "Remove items from the shopping list",
     "View current shopping list", 
     "Export list and quit",
@@ -54,19 +50,21 @@ def main():
   # DEBUG MODE set at top of this file
   if DEBUG_MODE:
     OPTIONS += DEBUG_OPTIONS
-    
-  terminal_menu = TerminalMenu(OPTIONS)
 
   shopping_list = ShoppingList()
 
   while(True):
-    terminal_menu = TerminalMenu(OPTIONS, status_bar="Items: " + str(shopping_list.length) + " | Recipes: " + str(len(shopping_list.recipes)))
+    terminal_menu = TerminalMenu(
+      OPTIONS, 
+      status_bar="Items: " + str(shopping_list.length) + " | Recipes: " + str(len(shopping_list.recipes)), 
+      status_bar_style=("bg_gray", "fg_green")
+    )
     menu_entry_index = terminal_menu.show()
 
     if menu_entry_index == 0:
-      add_recipe_by_url(shopping_list)
-    elif menu_entry_index == 1:
       add_items_to_list(shopping_list)
+    elif menu_entry_index == 1:
+      add_recipe_by_url(shopping_list)
     elif menu_entry_index == 2:
       remove_items_from_list(shopping_list)
     elif menu_entry_index == 3:
