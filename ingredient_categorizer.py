@@ -3,6 +3,10 @@ from utils import singularize, pluralize
 
 p = inflect.engine()
 
+####################
+# Ingredient Categorizer
+####################
+
 # for now just doing a lookup of these static lists to categorize ingredients
 # obviously db later, that can be added to on the fly
 
