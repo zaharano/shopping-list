@@ -144,11 +144,22 @@ class ShoppingList:
   def length(self):
     return len(self._items)
 
-  # add an item to the shopping list
-  # returns 0 if successful, 1 if existing item was added to, 
-  # 2 if existing item was not added to, 3 if item was not parsed
   def add_item(self, item, coeff = 1):
-    # change this I think - don't want it to choke on empty strings
+    '''
+    Given a string, parse it into an Ingredient object and add it to the list of items. If an item with the same name already exists in the list, attempt to add the new item to the existing item. Return a result code.
+
+    Parameters:
+    ----------
+    item : str
+      the string for the new item to add to the shopping list
+    coeff : int, optional
+      a coefficient by which to multiply the quantity of the item. Default is 1.
+
+    Returns:
+    -------
+    int
+      1 if the item is added to an existing item, 0 if it is appended to the list of items
+    '''
     if not item:
       raise TypeError("No item to add.")
     try:
@@ -157,12 +168,7 @@ class ShoppingList:
     except Exception as e:
       raise ParseException(f"Couldn't parse that item - {item}.")
     if coeff != 1:
-      # choosing not to choke on coeff not working right - yet
-      # eventually exception handling raised out of class methods
-      try:
-        new_item = new_item * coeff
-      except Exception as e:
-        cprint(e, 'red')
+      new_item = new_item * coeff
     existing_item = self.existing_item(new_item)
     if existing_item:
       return 1
