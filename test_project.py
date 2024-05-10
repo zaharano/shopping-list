@@ -49,10 +49,12 @@ def test_categorize_ingredient():
     assert categorize_ingredient("baking powder") == 'baking'
     assert categorize_ingredient("cilantro") == 'produce'
     assert categorize_ingredient("chicken broth") == 'pantry'
+    assert categorize_ingredient("chicken") == 'meat'
+    assert categorize_ingredient("kosher salt") == 'you_probably_already_have'
 
     # ' or ' splits the string and tests each
     assert categorize_ingredient("flatleaf or curly parsley") == 'produce'
     assert categorize_ingredient("ground beef or pork") == 'meat'
-
     # this is wrong but I'm not sure about easy way to fix it
     assert categorize_ingredient("chicken or beef broth") == 'meat'
+
