@@ -227,7 +227,8 @@ class ShoppingList:
 
     Returns:
     -------
-    None
+    int
+      1 if there were issues adding some ingredients from the recipe, 0 if there were no issues
     '''
     exists = False
     issues = False
@@ -348,6 +349,7 @@ class ShoppingIngredient:
     return self
 
   def __add__(self, other):
+    # TODO: implement this so that it returns a new object, not mutate the existing one
     # new_ingredient = copy.deepcopy(self)
     if type(other) != ShoppingIngredient:
       raise TypeError("Can only add an Ingredient to an Ingredient.")
@@ -355,6 +357,8 @@ class ShoppingIngredient:
       raise ValueError("Can only add ingredients with the same name.")
     if not self.quantity or not other.quantity:
       raise ValueError("Both ingredients must have a quantity to add them.")
+    if other.second_amount:
+      raise ValueError("Can't add ingredient with secondary amounts. This will be implemented in the future.")
     if type(self.unit) == Unit and type(other.unit) == Unit:
       if self.unit.is_compatible_with(other.unit):
         a = self.unit * float(self.quantity)
@@ -452,6 +456,7 @@ class ShoppingIngredient:
   def parsed(self):
     return self._parsed
 
+# this is probably not necessary - but wanted to collect all the parsing errors in one place
 class ParseException(Exception):
   pass
 
