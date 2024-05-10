@@ -1,11 +1,6 @@
-import inflect
-from utils import singularize, pluralize
-
-p = inflect.engine()
-
-####################
+############################################
 # Ingredient Categorizer
-####################
+############################################
 
 # for now just doing a lookup of these static lists to categorize ingredients
 # obviously db later, that can be added to on the fly
@@ -36,7 +31,7 @@ leafy_greens = ['arugula', 'collard greens', 'kale', 'lettuce', 'spinach', 'swis
 cruciferous_vegetables = ['broccoli', 'brussels sprout', 'brussel', 'brussel sprout', 'cabbage', 'cauliflower', 'kohlrabi']
 alliums = ['chive', 'garlic', 'leek', 'onion', 'shallot', 'green onion', 'scallion', 'spring onion', 'ramp', 'red onion', 'white onion', 'yellow onion', 'sweet onion', 'pearl onion', 'cippolini onion', 'vidalia onion', 'walla walla onion', 'maui onion', 'elephant garlic', 'garlic scape', 'garlic chive']
 other_vegetables = ['celery', 'cucumber', 'eggplant', 'fennel', 'okra', 'pea', 'snap pea', 'snow pea', 'tomato', 'cherry tomato', 'grape tomato', 'heirloom tomato', 'roma tomato', 'beefsteak tomato', 'plum tomato', 'green tomato', 'yellow tomato', 'orange tomato', 'purple tomato', 'white tomato', 'black tomato', 'pink tomato', 'striped tomato', 'corn', 'artichoke', 'asparagus', 'snap bean', 'green bean', 'wax bean', ]
-herbs = ['basil', 'cilantro', 'dill', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'thyme']
+herbs = ['basil', 'cilantro', 'dill', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'thyme', 'fresh parsley', 'fresh flat-leaf parsley', 'fresh curly parsley', 'curly parsley']
 peppers = ['bell pepper', 'green bell pepper', 'red bell pepper', 'yellow bell pepper', 'orange bell pepper', 'green pepper', 'red pepper', 'orange pepper', 'jalapeno', 'jalapeño', 'jalapeno peppers', 'poblano', 'poblano peppers', 'serrano', 'serrano peppers']
 mushrooms = ['button mushroom', 'cremini mushroom', 'portobello mushroom', 'shiitake mushroom']
 vegetables = [*squashes, *root_vegetables, *leafy_greens, *cruciferous_vegetables, *alliums, *herbs, *peppers, *mushrooms, *other_vegetables]
@@ -70,14 +65,14 @@ game = ['bison', 'ground bison', 'elk', 'moose', 'boar', 'bear', 'caribou', 'rei
 game_bird = ['partridge', 'pheasant', 'quail', 'squab', 'wild turkey', 'wild duck', 'wild goose', 'wild quail', 'wild pheasant', 'wild partridge', 'wild squab', 'wild game bird']
 game_meat = [*venison, *game, *game_bird]
 
-## Seafood
+## Seafood - these fish groups need checking haha
 shellfish = ['crab', 'crab meat', 'crabmeat', 'lobster', 'lobster meat', 'lobster tail', 'lobstermeat', 'mussel', 'oyster', 'shrimp', 'escargot', 'clam', 'scallop', 'abalone', 'conch', 'whelk', 'cockle', 'periwinkle', 'geoduck', 'sea urchin', 'uni']
 other_seafood = ['squid', 'calamari', 'octopus', 'sea cucumber']
 white_fish = ['cod', 'haddock', 'halibut', 'pollock', 'tilapia']
 oily_fish = ['mackerel', 'salmon', 'sardine', 'trout']
 flat_fish = ['flounder', 'sole']
 round_fish = ['bass', 'carp', 'perch', 'pike']
-tropical_fish = ['barracuda', 'grouper', 'snapper']
+tropical_fish = ['barracuda', 'grouper', 'snapper', 'red snapper']
 cartilaginous_fish = ['shark', 'ray']
 fillet_fish = [*white_fish, *oily_fish, *flat_fish, *round_fish, *tropical_fish]
 fish_fillets = [fish + ' fillet' for fish in fillet_fish]
@@ -87,9 +82,9 @@ anchovy = ['anchovy', 'canned anchovy', 'anchovy fillet', 'canned anchovy fillet
 canned_fish = ['canned tuna', 'canned salmon', 'canned sardine', 'canned mackerel', 'canned herring', 'canned trout', 'canned fish', 'canned seafood', 'canned shellfish']
 
 ## Bread
-bread = ['bread', 'baguette', 'biscuit', 'bun', 'cornbread', 'croissant', 'doughnut', 'flatbread', 'focaccia', 'hamburger bun', 'naan', 'pita', 'roll', 'sourdough', 'tortilla', 'white bread', 'whole wheat bread', 'rye bread', 'rye', 'french bread', 'italian bread', 'ciabatta', 'bagel', 'muffin']
+bread = ['bread', 'baguette', 'biscuit', 'bun', 'cornbread', 'croissant', 'doughnut', 'flatbread', 'focaccia', 'hamburger bun', 'naan', 'pita', 'roll', 'sourdough', 'tortilla', 'white bread', 'whole wheat bread', 'rye bread', 'rye', 'french bread', 'italian bread', 'ciabatta', 'bagel', 'muffin', 'white bread', 'white sandwich bread']
 pastas = ['pasta', 'angel hair', 'bowtie', 'bucatini', 'fettuccine', 'linguine', 'macaroni', 'orecchiette', 'penne', 'rigatoni', 'spaghetti', 'tortellini']
-rices = ['rice', 'arborio', 'arborio rice', 'basmati', 'basmati rice', 'black rice', 'brown rice', 'cargo rice', 'jasmine rice', 'long grain rice', 'short grain rice', 'wild rice']
+rices = ['rice', 'arborio', 'arborio rice', 'basmati', 'basmati rice', 'black rice', 'brown rice', 'cargo rice', 'jasmine rice', 'long grain rice', 'short grain rice', 'wild rice', 'white rice', 'short-grain rice', 'shortgrain rice', 'long-grain rice', 'longgrain rice', 'brown basmati rice', 'white basmati rice', 'brown jasmine rice', 'white jasmine rice', 'brown cargo rice', 'white cargo rice', 'brown long grain rice', 'white long grain rice', 'brown short grain rice', 'white short grain rice', 'brown wild rice', 'white wild rice', 'brown rice', 'white rice', 'brown basmati', 'white basmati', 'brown jasmine', 'white jasmine',]
 grains = ['barley', 'buckwheat', 'corn', 'millet', 'oats', 'quinoa', 'rye', 'sorghum', 'wheat']
 
 dairy_milks = ['milk', 'whole milk', 'skim milk', '2% milk', '1% milk', 'half and half', 'cream', 'heavy cream', 'whipping cream', 'light cream', 'half and half', 'buttermilk',]
@@ -108,6 +103,9 @@ eggs = ['egg', 'chicken egg', 'duck egg', 'goose egg', 'quail egg', 'ostrich egg
 # going to need to use the unit 'can' to determine if it's canned vs dry
 # also plurality will be odd I think
 beans = ['black bean', 'black beans', 'black-eyed pea', 'cannellini', 'cannelini bean', 'chickpea', 'garbanzo bean', 'great northern', 'kidney', 'lentil', 'lima', 'navy', 'pinto', 'red bean', 'soybean', 'split pea', 'white bean', 'bean', 'canned bean', 'canned black bean', 'canned black-eyed pea', 'canned cannellini', 'canned chickpea', 'canned garbanzo bean', 'canned great northern', 'canned kidney', 'canned lentil', 'canned lima', 'canned navy', 'canned pinto', 'canned red bean', 'canned soybean', 'canned split pea', 'canned white bean',]
+
+# meeleon tomato varieties
+canned = ['tomato paste', 'canned tomato', 'chopped tomato', 'tomato sauce', 'canned tomato sauce', 'canned artichokes', 'canned artichoke heart', 'artichoke heart in brine', 'caper', 'caper berry']
 
 ### oils and vinegars
 oils = ['oil', 'olive oil', 'vegetable oil', 'canola oil', 'coconut oil', 'sesame oil', 'peanut oil', 'sunflower oil', 'safflower oil', 'corn oil', 'soybean oil', 'grapeseed oil', 'avocado oil', 'walnut oil', 'almond oil', 'hazelnut oil', 'palm oil', 'lard', 'shortening', 'margarine', 'butter', 'ghee', 'clarified butter',]
@@ -136,15 +134,18 @@ baking = [*flours, *sugars, *leaveners, *chocolates]
 
 ### Spices and dried herbs
 spices = ['spice', 'allspice', 'anise', 'annatto', 'asafoetida', 'caraway', 'cardamom', 'cayenne', 'celery seed', 'chervil',  'cinnamon', 'ground cinnamon', 'clove', 'ground clove', 'coriander', 'cumin', 'cumin seed', 'ground cumin', 'curry', 'curry powder', 'fennel seed', 'fenugreek seed', 'garlic powder', 'ginger powder', 'ground ginger', 'lavender', 'mustard seed', 'mustard powder', 'nutmeg', 'ground nutmeg', 'paprika', 'black pepper', 'poppy seed', 'rosemary', 'saffron', 'sage', 'savory', 'tarragon', 'thyme', 'turmeric', 'ground turmeric', 'turmeric powder', 'vanilla', 'wasabi', 'zaatar', 'ground fennel', 'ground fennel seed', 'fennel powder']
-dried_herbs = ['herb', 'basil', 'bay leaf', 'chervil', 'chive', 'cilantro', 'dill', 'lavender', 'lemon grass', 'marjoram', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'savory', 'tarragon', 'thyme']
-peppers = ['black pepper', 'white pepper', 'cayenne pepper', 'chipotle powder', 'ground chili', 'chili powder', 'new mexico chili powder', 'red-pepper', 'red-pepper flakes', 'red pepper flakes']
-all_spices = [*spices, *dried_herbs, *peppers]
+d_herbs = ['herb', 'basil', 'bay leaf', 'chervil', 'chive', 'cilantro', 'dill', 'lavender', 'lemon grass', 'marjoram', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'savory', 'tarragon', 'thyme']
+dried_herbs = [h + ', dried' for h in d_herbs] + ['dried ' + h for h in d_herbs]
+dried_peppers = [p + ', dried' for p in peppers] + ['dried ' + p for p in peppers] + ['white pepper', 'cayenne pepper', 'chipotle powder', 'ground chili', 'chili powder', 'new mexico chili powder', 'red-pepper', 'red-pepper flakes', 'red pepper flakes']
+all_spices = [*spices, *dried_herbs, *dried_peppers]
+
+misc_pantry = ['bread crumbs', 'breadcrumbs', 'panko', 'panko breadcrumbs', 'chicken broth', 'beef broth', 'chicken stock', 'beef stock']
 
 ### Frozen foods
 frozen_veggies = ['frozen peas', 'frozen carrots', 'frozen spinach', 'frozen corn', 'frozen lima beans', 'frozen green beans', 'frozen broccoli', 'frozen cauliflower', 'frozen brussels sprouts', 'frozen mixed vegetables', 'frozen stir fry vegetables', 'frozen vegetable medley', 'frozen vegetable blend', 'frozen vegetable mix', 'frozen vegetable', 'frozen veggie', 'frozen veg', 'frozen greens', 'frozen leafy greens', 'frozen root vegetables', 'frozen squash', 'frozen bell pepper', 'frozen vegetable' ]
 frozen_fruit = ['frozen fruit', 'frozen berry', 'frozen banana', 'frozen mango', 'frozen pineapple', 'frozen peach', 'frozen apple', 'frozen pear', 'frozen cherry', 'frozen blueberry', 'frozen blackberry', 'frozen raspberry', 'frozen strawberry', 'frozen cranberry', 'frozen grape', 'frozen citrus', 'frozen orange', 'frozen lemon', 'frozen lime', 'frozen grapefruit', 'frozen tangerine', 'frozen kiwi', 'frozen tropical fruit', ]
 
-you_probably_have = ['water', 'salt', 'kosher salt', 'pepper', 'black pepper', 'salt and pepper', 'salt & pepper', 'kosher salt and black pepper']
+you_probably_have = ['water', 'oil', 'olive oil', 'extra virgin olive oil', 'evoo', 'extra-virgin olive oil', 'cooking oil', 'salt', 'kosher salt', 'sea salt', 'fine salt', 'table salt', 'pepper', 'black pepper', 'salt and pepper', 'salt & pepper', 'kosher salt and black pepper']
 
 # dairy, sauces, canned, baking, snacks, beverages, frozen, misc
 
@@ -154,8 +155,8 @@ grocer_categories = {
     'meat': [*poultry, *red_meat, *game_meat,],
     'seafood': [*fresh_seafood],
     'bread': [*bread],
-    'dairy': [*dairy_milks, *alternative_milks, *butter, *yogurt, *sour_creams, *all_cheeses, *eggs],
-    'pantry': [*pastas, *rices, *grains, *canned_fish, *anchovy, *beans, *vinegars, *oils, *all_spices, *sauces, *nuts, *nut_butters, *seeds, *dried_fruits, *dried_berries],
+    'dairy_and_eggs': [*dairy_milks, *alternative_milks, *butter, *yogurt, *sour_creams, *all_cheeses, *eggs],
+    'pantry': [*pastas, *rices, *grains, *canned_fish, *anchovy, *beans, *vinegars, *oils, *all_spices, *sauces, *nuts, *nut_butters, *seeds, *dried_fruits, *dried_berries, *canned, *misc_pantry],
     'baking': [*baking],
     'frozen': [*frozen_veggies, *frozen_fruit],
 }
@@ -172,21 +173,31 @@ def categorize_ingredient(ingredient, unit = None):
   ingredient = ingredient.lower()
   for char in DROPPED_CHARACTERS:
     ingredient = ingredient.replace(char, '')
-  for category, items in grocer_categories.items():
-    if ingredient in items or singularize(ingredient) in items:
-      return category
+  if ' or ' in ingredient:
+    split = ingredient.split(' or ') + [ingredient]
+  else:
+    split = [ingredient]
+  for i in split:
+    i = i.strip()
+    for category, items in grocer_categories.items():
+      if i in items or singularize(i) in items:
+        return category
   return 'misc'
 
 # this is probably better, but needs distinction in the data for terms that
 # are too broad like 'pepper' with match 'green pepper' and 'red-pepper flakes'
 # and screw up the categorization. but this catches the above or statements
 # ultimately, going to have to write something that has a confidence value maybe
-def categorize_ingredient_broadly(ingredient, unit = None):
-  ingredient = ingredient.lower()
-  for char in DROPPED_CHARACTERS:
-    ingredient = ingredient.replace(char, '')
-  for category, items in grocer_categories.items():
-    for item in items:
-      if item in ingredient or item in singularize(ingredient):
-        return category
-  return 'misc'
+# def categorize_ingredient_broadly(ingredient, unit = None):
+#   ingredient = ingredient.lower()
+#   for char in DROPPED_CHARACTERS:
+#     ingredient = ingredient.replace(char, '')
+#   split = [ingredient] + ingredient.split(' or ')
+#   for i in split:
+#     i = i.strip()
+#     for category, items in grocer_categories.items():
+#       for item in items:
+#         if item in i or item in singularize(i):
+#           print(f'{ingredient} -> {category}')
+#           return category
+#   return 'misc'

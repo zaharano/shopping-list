@@ -1,9 +1,6 @@
 ############################################
 # BEGIN UTILS.PY
 ############################################
-import pint
-import inflect
-
 p = inflect.engine()
 
 # this is taken from a newer version of the parser - eventually this will just be from that but wanted to get the pint func going
@@ -205,16 +202,18 @@ def singularize_unit(unit: str) -> str:
 
     Examples
     --------
-    >>> singularize("cups")
+    >>> singularize_unit("cups")
     'cup'
 
-    >>> singularize("pints")
+    >>> singularize_unit("pints")
     'pint'
 
-    >>> singularize("g")
+    >>> singularize_unit("g")
     'g'
     """
     return UNITS.get(unit, unit)
+
+    
 
 def pluralize_unit(unit: str) -> str:
     """Return the plural form of a unit, if it exists in the UNITS dictionary.
@@ -231,16 +230,19 @@ def pluralize_unit(unit: str) -> str:
 
     Examples
     --------
-    >>> pluralize("cup")
+    >>> pluralize_unit("cup")
     'cups'
 
-    >>> pluralize("pint")
+    >>> pluralize_unit("pint")
     'pints'
 
-    >>> pluralize("g")
+    >>> pluralize_unit("g")
     'g'
     """
-    return UNITS.get(unit, unit)
+    for k, v in UNITS.items():
+      if v == unit:
+        return k
+    return unit
 
 def pluralize(noun: str, count: float | int = 0) -> str:
     """Return the plural form of a noun, from inflect engine, unless count is exactly 1. This logic may need tweaking.
@@ -264,7 +266,7 @@ def pluralize(noun: str, count: float | int = 0) -> str:
     """
     if count == 1:
         return noun
-    if singularize(noun) == False:
+    if p.singular_noun(noun) == False:
         return p.plural(noun, count)
     return noun
 
