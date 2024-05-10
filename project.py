@@ -357,7 +357,7 @@ class ShoppingIngredient:
       raise ValueError("Can only add ingredients with the same name.")
     if not self.quantity or not other.quantity:
       raise ValueError("Both ingredients must have a quantity to add them.")
-    if other.second_amount:
+    if other.amount_two:
       raise ValueError("Can't add ingredient with secondary amounts. This will be implemented in the future.")
     if type(self.unit) == Unit and type(other.unit) == Unit:
       if self.unit.is_compatible_with(other.unit):
@@ -893,7 +893,7 @@ leafy_greens = ['arugula', 'collard greens', 'kale', 'lettuce', 'spinach', 'swis
 cruciferous_vegetables = ['broccoli', 'brussels sprout', 'brussel', 'brussel sprout', 'cabbage', 'cauliflower', 'kohlrabi']
 alliums = ['chive', 'garlic', 'leek', 'onion', 'shallot', 'green onion', 'scallion', 'spring onion', 'ramp', 'red onion', 'white onion', 'yellow onion', 'sweet onion', 'pearl onion', 'cippolini onion', 'vidalia onion', 'walla walla onion', 'maui onion', 'elephant garlic', 'garlic scape', 'garlic chive']
 other_vegetables = ['celery', 'cucumber', 'eggplant', 'fennel', 'okra', 'pea', 'snap pea', 'snow pea', 'tomato', 'cherry tomato', 'grape tomato', 'heirloom tomato', 'roma tomato', 'beefsteak tomato', 'plum tomato', 'green tomato', 'yellow tomato', 'orange tomato', 'purple tomato', 'white tomato', 'black tomato', 'pink tomato', 'striped tomato', 'corn', 'artichoke', 'asparagus', 'snap bean', 'green bean', 'wax bean', ]
-herbs = ['basil', 'cilantro', 'dill', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'thyme', 'fresh parsley', 'fresh flat-leaf parsley', 'fresh curly parsley', 'fresh flat-leaf or curly parsley']
+herbs = ['basil', 'cilantro', 'dill', 'mint', 'oregano', 'parsley', 'rosemary', 'sage', 'thyme', 'fresh parsley', 'fresh flat-leaf parsley', 'fresh curly parsley', 'curly parsley']
 peppers = ['bell pepper', 'green bell pepper', 'red bell pepper', 'yellow bell pepper', 'orange bell pepper', 'green pepper', 'red pepper', 'orange pepper', 'jalapeno', 'jalapeño', 'jalapeno peppers', 'poblano', 'poblano peppers', 'serrano', 'serrano peppers']
 mushrooms = ['button mushroom', 'cremini mushroom', 'portobello mushroom', 'shiitake mushroom']
 vegetables = [*squashes, *root_vegetables, *leafy_greens, *cruciferous_vegetables, *alliums, *herbs, *peppers, *mushrooms, *other_vegetables]
@@ -927,14 +927,14 @@ game = ['bison', 'ground bison', 'elk', 'moose', 'boar', 'bear', 'caribou', 'rei
 game_bird = ['partridge', 'pheasant', 'quail', 'squab', 'wild turkey', 'wild duck', 'wild goose', 'wild quail', 'wild pheasant', 'wild partridge', 'wild squab', 'wild game bird']
 game_meat = [*venison, *game, *game_bird]
 
-## Seafood
+## Seafood - these fish groups need checking haha
 shellfish = ['crab', 'crab meat', 'crabmeat', 'lobster', 'lobster meat', 'lobster tail', 'lobstermeat', 'mussel', 'oyster', 'shrimp', 'escargot', 'clam', 'scallop', 'abalone', 'conch', 'whelk', 'cockle', 'periwinkle', 'geoduck', 'sea urchin', 'uni']
 other_seafood = ['squid', 'calamari', 'octopus', 'sea cucumber']
 white_fish = ['cod', 'haddock', 'halibut', 'pollock', 'tilapia']
 oily_fish = ['mackerel', 'salmon', 'sardine', 'trout']
 flat_fish = ['flounder', 'sole']
 round_fish = ['bass', 'carp', 'perch', 'pike']
-tropical_fish = ['barracuda', 'grouper', 'snapper']
+tropical_fish = ['barracuda', 'grouper', 'snapper', 'red snapper']
 cartilaginous_fish = ['shark', 'ray']
 fillet_fish = [*white_fish, *oily_fish, *flat_fish, *round_fish, *tropical_fish]
 fish_fillets = [fish + ' fillet' for fish in fillet_fish]
