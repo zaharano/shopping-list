@@ -1,3 +1,5 @@
+from utils import singularize
+
 ############################################
 # Ingredient Categorizer
 ############################################
